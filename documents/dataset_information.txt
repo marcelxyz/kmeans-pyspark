@@ -1,0 +1,19 @@
+The dataset for StackOverflow is a set of files, each of them contains one XML record per line.
+
+The dataset is currently hosted in archive.org
+https://archive.org/details/stackexchange
+
+With the default inputformat from Hadoop, each Map call will receive one single item with the structure specified in the documentation, encoded in the Text value.
+In order to simplify its parsing, we recommend the following approach (Taken from Miner D. & Shook, A, "MapReduce Design Patterns", O' Reilly, 2013)
+
+The following util class has the transformXmlToMap(String xml) method that simplifies parsing of stackoverflow data format.  
+https://github.com/adamjshook/mapreducepatterns/blob/master/MRDP/src/main/java/mrdp/utils/MRDPUtils.java
+
+
+Once you have parsed the xml string with the method, you can directly access its attributes getting the requested key from the Map.
+Map<String, String> parsed = transformXmlToMap(xmlString);
+String strDate = parsed.get(creationDate);
+String userId = parsed.get(userId);
+
+Data format
+https://archive.org/download/stackexchange/readme.txt
