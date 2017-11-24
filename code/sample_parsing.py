@@ -1,3 +1,5 @@
+# Added sample comment to test new gitflow.
+
 class Parser:
 
 	# Checks for the presence of all the specified fields in an XML object; returns true if they're all found, false if not
