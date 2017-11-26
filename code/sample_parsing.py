@@ -1,3 +1,5 @@
+# Added sample comment to test new gitflow.
+
 class Parser:
 
 	# Checks for the presence of all the specified fields in an XML object; returns true if they're all found, false if not
@@ -57,15 +59,3 @@ class Badge:
 
 # user_row = "<row Id=\"16193\" Reputation=\"1858\" CreationDate=\"2008-09-17T15:17:49.837\" DisplayName=\"dhiller\" LastAccessDate=\"2014-01-17T13:30:56.400\" WebsiteUrl=\"http://www.dhiller.de\" Location=\"Muenster, Germany\" AboutMe=\"&lt;p&gt;Java software developer&lt;/p&gt;&#xA;\" Views=\"225\" UpVotes=\"225\" DownVotes=\"3\" Age=\"42\" AccountId=\"8891\" />"
 # badge_row = "<row Id=\"131133\" UserId=\"10410\" Name=\"Supporter\" Date=\"2008-09-26T00:47:34.057\" />"
-
-
-
-
-
-
-
-
-
-
-
-
