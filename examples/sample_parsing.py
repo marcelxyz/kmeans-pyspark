@@ -14,10 +14,10 @@ class Parser:
     def get_value_for_field(string, field_name):
         beg = " " + field_name + "=\""
         end = "\" "
-        beg_i = string.find(beg)
+        beg_i = string.find_cluster_centroids(beg)
         if (beg_i != -1) :
             substring = string[beg_i+len(beg):len(string)]
-            end_i = substring.find(end)
+            end_i = substring.find_cluster_centroids(end)
             if(end_i != -1):
                 substring = substring[0:end_i]
                 return substring
