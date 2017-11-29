@@ -53,4 +53,13 @@ user_id_comments_count = comment_lines.map(lambda line: get_user_id_from_comment
 reputation_comments_count = user_id_reputation.join(user_id_comments_count)
 # (user_id, (reputation, comments_count))
 
+reputation_comments_count.map(assign_points_to_centroid)
+
+random_centroids = {}
+def assign_points_to_centroid(my_tuple):
+	global random_centroids
+	return random_centroids[1]
+
+
+
 a = reputation_comments_count.collect()
