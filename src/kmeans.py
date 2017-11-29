@@ -32,7 +32,10 @@ class KMeans:
 
                 clusters[best_centroid].append(point)
 
-            centroids = [self.calculate_centroid(points) for points in clusters.values()]
+            new_centroids = [self.calculate_centroid(points) for points in clusters.values()]
+            for j in range(0, len(centroid) - len(new_centroids)):
+                new_centroids.append(self.generate_random_point())
+            centroids = new_centroids
         return centroids
 
     def generate_random_centroids(self):
