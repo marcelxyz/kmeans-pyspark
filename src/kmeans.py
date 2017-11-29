@@ -40,10 +40,7 @@ class KMeans:
 
     def generate_random_centroids(self):
         """Generates a random point (the centroid) for each cluster"""
-        centroids = []
-        for i in range(0, self.k):
-            centroids.append(self.generate_random_point())
-        return centroids
+        return [self.generate_random_point() for i in range(self.k)]
 
     @staticmethod
     def calculate_centroid(points):
@@ -56,16 +53,13 @@ class KMeans:
     @staticmethod
     def calculate_distance(a, b):
         """Returns the distance between two points"""
-        n = len(a)
-        sum = 0
-        for i in range(0, n):
-            sum = sum + pow(abs(a[i] - b[i]), 2)
-        return math.sqrt(sum)
+        deltas = map(lambda p: pow(p[0] - p[1], 2), zip(a, b))
+        return math.sqrt(sum(deltas))
 
     def generate_random_point(self):
         """Returns a random point within the edges provided"""
         coordinates = []
-        for i in range(0, self.n):
+        for i in range(self.n):
             coordinates.append(random.uniform(self.outer_vertices[2 * i], self.outer_vertices[2 * i + 1]))
         return tuple(coordinates)
 

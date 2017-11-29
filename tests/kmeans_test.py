@@ -38,11 +38,10 @@ class KmeansTest(unittest.TestCase):
         self.assertTrue((1.5, 1.5, 8.0) in means_tuples)
 
     def test_calculate_distance(self):
-        # loool couldn't come up with a fitting example
-        a = (3, 5, 0)
-        b = (6, 9, 0)
+        a = (3, 5, 8, 15)
+        b = (2, 3, 4, 5)
         distance = kmeans.KMeans.calculate_distance(a, b)
-        self.assertEqual(distance, 5)
+        self.assertEqual(distance, 11)
 
     def test_calculate_centroid(self):
         points = [
