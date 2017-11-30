@@ -23,7 +23,7 @@ class KmeansTest(unittest.TestCase):
             (2, 1, 7),
         ]
         self.num_of_clusters = 3
-        self.kmeans = kmeans.KMeans(self.points, self.num_of_clusters, 100)
+        self.kmeans = kmeans.KMeans(self.points, self.num_of_clusters)
 
     def test_calculate_outer_vertices(self):
         edges = self.kmeans.find_outer_vertices()
@@ -50,25 +50,3 @@ class KmeansTest(unittest.TestCase):
         ]
         centroids = kmeans.KMeans.calculate_centroid(points)
         self.assertEqual(centroids, (2, 3, 4))
-
-    def test_centroids_are_equal(self):
-        a = [
-            (1, 2, 3),
-            (3, 4, 5),
-        ]
-        b = [
-            (1, 2, 3),
-            (3, 4, 5),
-        ]
-        c = [
-            (1, 2, 3),
-            (3, 4, 6),
-        ]
-        d = [
-            (1, 2, 3),
-            (3, 4, 6),
-            (3, 4, 6),
-        ]
-        self.assertEqual(kmeans.KMeans.centroids_are_equal(a, b), True)
-        self.assertEqual(kmeans.KMeans.centroids_are_equal(a, c), False)
-        self.assertEqual(kmeans.KMeans.centroids_are_equal(a, d), False)

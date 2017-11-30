@@ -4,20 +4,17 @@ import numpy
 
 
 class KMeans:
-    def __init__(self, points, clusters, max_iterations):
+    def __init__(self, points, clusters):
         """Initialises a KMeans classifier with the list of points and the target number of clusters"""
         self.points = points
         self.k = clusters
         self.n = len(points[0])
-        self.max_iterations = max_iterations
         self.outer_vertices = self.find_outer_vertices()
 
     def find_cluster_centroids(self):
         """Runs an infinite loop which contains an iteration on the self.points to find the nearest mean"""
         centroids = self.generate_random_centroids()
-        i = 0
-        converged = False
-        while i < 100 and converged == False:
+        for i in range(100):
             clusters = {}
 
             for point in self.points:
@@ -38,24 +35,12 @@ class KMeans:
             new_centroids = [self.calculate_centroid(points) for points in clusters.values()]
             for j in range(0, len(centroid) - len(new_centroids)):
                 new_centroids.append(self.generate_random_point())
-            converged = self.centroids_are_equal(centroids, new_centroids)
             centroids = new_centroids
-            i += 1
         return centroids
 
     def generate_random_centroids(self):
         """Generates a random point (the centroid) for each cluster"""
         return [self.generate_random_point() for i in range(self.k)]
-
-    @staticmethod
-    def centroids_are_equal(a, b):
-        if len(a) != len(b):
-            return False
-        else:
-            for centroid in a:
-                if centroid not in b:
-                    return False
-            return True
 
     @staticmethod
     def calculate_centroid(points):
