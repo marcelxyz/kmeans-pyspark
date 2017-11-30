@@ -1,2 +1,4 @@
 .idea
 __pycache__
+derby.log
+metastore_db
