@@ -31,11 +31,9 @@ def get_upvotes_and_downvotes_from_user_row(string):
 def kmeans(points, k, max_iterations):
     outer_vertices = get_outer_vertices(points)
     centroids = get_random_centroids(outer_vertices, k)
-    clusters = None
     for i in range(0, max_iterations):
-        clusters = points.flatMap(lambda point: (get_nearest_centroid(point, centroids), point))
-        f = clusters.combineByKey(to_list, append, extend)
-        #reduced_clusters = clusters.reduceByKey(lambda a, b: a.append(b))
+        clusters = points.map(lambda point: (get_nearest_centroid(point, centroids), point))
+        f = clusters.groupByKey()
         return f
 
 def to_list(x):
@@ -80,9 +78,9 @@ def get_distance(point_a, point_b):
 conf = SparkConf().setAppName("app_name")
 sc = SparkContext(conf = conf)
 
-user_lines = sc.textFile("/data/stackoverflow/Users")
+user_lines = sc.textFile("/home/marcel/Workspace/BigData/data/users.xml")
 upvotes_and_downvotes = user_lines.map(lambda line: get_upvotes_and_downvotes_from_user_row(line)).filter(lambda v: v != (None, None))
-result = kmeans(upvotes_and_downvotes, 4, 100).collect()
+result = kmeans(upvotes_and_downvotes, 4, 100).takeSample(False, 10)
 print(result)
 
 
