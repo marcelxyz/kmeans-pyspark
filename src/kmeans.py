@@ -35,7 +35,7 @@ class KMeans:
 
             new_centroids = [self.calculate_centroid(points) for points in clusters.values()]
 
-            if self.k != len(new_centroids):
+            if len(centroid) > len(new_centroids):
                 raise RuntimeError('Centroid length differs')
 
             # for j in xrange(len(centroid) - len(new_centroids)):

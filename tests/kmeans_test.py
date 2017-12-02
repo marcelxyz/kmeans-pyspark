@@ -30,12 +30,12 @@ class KmeansTest(unittest.TestCase):
         self.assertEqual(edges, (1, 9, 0, 2, 0, 9))
 
     def test_find_cluster_centroids(self):
-        means = self.kmeans.find_cluster_centroids()
-        means_tuples = list(map(lambda point: tuple(point), means))  # convert list of Point objects to list of tuples
-        self.assertEqual(len(means), self.num_of_clusters)
-        self.assertTrue((1.5, 1.5, 1.0) in means_tuples)
-        self.assertTrue((8.5, 1.0, 1.0) in means_tuples)
-        self.assertTrue((1.5, 1.5, 8.0) in means_tuples)
+        centroids = self.kmeans.find_cluster_centroids()
+        centroid_tuples = list(map(lambda point: tuple(point), centroids))  # convert list of Point objects to list of tuples
+        self.assertEqual(len(centroids), self.num_of_clusters)
+        self.assertTrue((1.5, 1.5, 1.0) in centroid_tuples)
+        self.assertTrue((8.5, 1.0, 1.0) in centroid_tuples)
+        self.assertTrue((1.5, 1.5, 8.0) in centroid_tuples)
 
     def test_calculate_distance(self):
         a = (3, 5, 8, 15)
