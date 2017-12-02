@@ -2,6 +2,8 @@ from pyspark import SparkConf, SparkContext
 import numpy as np
 import math
 import random
+import kmeanspark
+
 
 def get_value_for_field(string, field):
     beg = " " + field + "=\""
@@ -18,6 +20,7 @@ def get_value_for_field(string, field):
     else:
         return None
 
+
 def get_upvotes_and_downvotes_from_user_row(string):
     try:
         upvotes = int(get_value_for_field(string, "UpVotes"))
@@ -28,6 +31,7 @@ def get_upvotes_and_downvotes_from_user_row(string):
 
 ################################################################
 
+
 def kmeans(points, k, max_iterations):
     outer_vertices = get_outer_vertices(points)
     centroids = get_random_centroids(outer_vertices, k)
@@ -36,18 +40,22 @@ def kmeans(points, k, max_iterations):
         f = clusters.groupByKey()
         return f
 
+
 def to_list(x):
     return [x]
+
 
 def get_centroid(points):
     xs = points.map(lambda point: point[0]).collect()
     ys = points.map(lambda point: point[1]).collect()
     return (avg(xs), avg(ys))
 
+
 def get_outer_vertices(points):
     xs = points.map(lambda point: point[0]).collect()
     ys = points.map(lambda point: point[1]).collect()
     return (min(xs), max(xs), min(ys), max(ys))
+
 
 def get_random_centroids(outer_vertices, k):
     centroids = []
@@ -55,8 +63,10 @@ def get_random_centroids(outer_vertices, k):
         centroids.append(get_random_point(outer_vertices))
     return centroids
 
+
 def get_random_point(outer_vertices):
     return (random.uniform(outer_vertices[0], outer_vertices[1]), random.uniform(outer_vertices[2], outer_vertices[3]))
+
 
 def get_nearest_centroid(point, centroids):
     best_distance = float("+Inf")
@@ -67,6 +77,7 @@ def get_nearest_centroid(point, centroids):
             best_distance = distance
             best_centroid = centroid
     return centroid
+
 
 def get_distance(point_a, point_b):
     d_x = abs(point_a[0] - point_b[0])

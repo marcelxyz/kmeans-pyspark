@@ -3,90 +3,76 @@ import random
 import numpy
 
 
-class KMeans:
-    def __init__(self, points, clusters, max_iterations):
-        """Initialises a KMeans classifier with the list of points and the target number of clusters"""
-        self.points = points
-        self.k = clusters
-        self.n = len(points[0])
-        self.max_iterations = max_iterations
-        self.outer_vertices = self.find_outer_vertices()
+def find_cluster_centroids(points, k):
+    dimension_count = len(points[0])
+    outer_vertices = find_outer_vertices(points)
+    centroids = generate_random_centroids(k, dimension_count, outer_vertices)
+    for i in xrange(1):
+        clusters = {}
 
-    def find_cluster_centroids(self):
-        """Runs an infinite loop which contains an iteration on the self.points to find the nearest mean"""
-        centroids = self.generate_random_centroids()
-        i = 0
-        converged = False
-        while i < 100 and converged == False:
-            clusters = {}
+        for point in points:
+            best_distance = float("+inf")
+            best_centroid = None
 
-            for point in self.points:
-                best_distance = float("+inf")
-                best_centroid = None
+            for centroid in centroids:
+                distance = calculate_distance(centroid, point)
+                if distance < best_distance:
+                    best_distance = distance
+                    best_centroid = centroid
 
-                for centroid in centroids:
-                    distance = self.calculate_distance(centroid, point)
-                    if distance < best_distance:
-                        best_distance = distance
-                        best_centroid = centroid
+            if best_centroid not in clusters:
+                clusters[best_centroid] = []
 
-                if best_centroid not in clusters:
-                    clusters[best_centroid] = []
+            clusters[best_centroid].append(point)
 
-                clusters[best_centroid].append(point)
+        new_centroids = [calculate_centroid(points) for points in clusters.values()]
 
-            new_centroids = [self.calculate_centroid(points) for points in clusters.values()]
-            for j in range(0, len(centroid) - len(new_centroids)):
-                new_centroids.append(self.generate_random_point())
-            converged = self.centroids_are_equal(centroids, new_centroids)
-            centroids = new_centroids
-            i += 1
-        return centroids
+        for j in xrange(len(centroid) - len(new_centroids)):
+            new_centroids.append(generate_random_point(dimension_count, outer_vertices))
+        #
+        # if centroids == new_centroids:
+        #     break
+        #
+        centroids = new_centroids
+    return centroids
 
-    def generate_random_centroids(self):
-        """Generates a random point (the centroid) for each cluster"""
-        return [self.generate_random_point() for i in range(self.k)]
 
-    @staticmethod
-    def centroids_are_equal(a, b):
-        if len(a) != len(b):
-            return False
-        else:
-            for centroid in a:
-                if centroid not in b:
-                    return False
-            return True
+def generate_random_centroids(k, dimension_count, outer_vertices):
+    """Generates a random point (the centroid) for each cluster"""
+    return [generate_random_point(dimension_count, outer_vertices) for i in xrange(k)]
 
-    @staticmethod
-    def calculate_centroid(points):
-        n = len(points[0])
-        means = []
-        for i in range(0, n):
-            means.append(numpy.mean([p[i] for p in points]))
-        return tuple(means)
 
-    @staticmethod
-    def calculate_distance(a, b):
-        """Returns the distance between two points"""
-        deltas = map(lambda p: pow(p[0] - p[1], 2), zip(a, b))
-        return math.sqrt(sum(deltas))
+def calculate_centroid(points):
+    means = []
+    for i in xrange(len(points[0])):
+        means.append(numpy.mean([p[i] for p in points]))
+    return tuple(means)
 
-    def generate_random_point(self):
-        """Returns a random point within the edges provided"""
-        coordinates = []
-        for i in range(self.n):
-            coordinates.append(random.uniform(self.outer_vertices[2 * i], self.outer_vertices[2 * i + 1]))
-        return tuple(coordinates)
 
-    def find_outer_vertices(self):
-        """Gets the edges of the point set"""
-        edges = []
-        # sets the initial edges to be +inf and -inf for every dimension
-        for i in range(0, self.n):
-            edges.append(float("+inf"))
-            edges.append(float("-inf"))
-        for point in self.points:
-            for i in range(0, self.n):
-                edges[2 * i] = min(edges[2 * i], point[i])
-                edges[2 * i + 1] = max(edges[2 * i + 1], point[i])
-        return tuple(edges)
+def calculate_distance(a, b):
+    """Returns the distance between two points"""
+    deltas = map(lambda p: pow(p[0] - p[1], 2), zip(a, b))
+    return math.sqrt(sum(deltas))
+
+
+def generate_random_point(dimension_count, outer_vertices):
+    """Returns a random point within the edges provided"""
+    coordinates = []
+    for i in xrange(dimension_count):
+        coordinates.append(random.uniform(outer_vertices[2 * i], outer_vertices[2 * i + 1]))
+    return tuple(coordinates)
+
+
+def find_outer_vertices(points):
+    """Gets the edges of the point set"""
+    dimension_count = len(points[0])
+    edges = []
+    # sets the initial edges to be +inf and -inf for every dimension
+    for i in xrange(dimension_count):
+        edges.append(float("+inf"))
+        edges.append(float("-inf"))
+    for point in points:
+        for i in xrange(dimension_count):
+            edges[2 * i] = min(edges[2 * i], point[i])
+            edges[2 * i + 1] = max(edges[2 * i + 1], point[i])
+    return tuple(edges)

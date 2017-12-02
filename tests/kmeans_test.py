@@ -23,14 +23,14 @@ class KmeansTest(unittest.TestCase):
             (2, 1, 7),
         ]
         self.num_of_clusters = 3
-        self.kmeans = kmeans.KMeans(self.points, self.num_of_clusters, 100)
+        self.dimensions = 3
 
-    def test_calculate_outer_vertices(self):
-        edges = self.kmeans.find_outer_vertices()
+    def test_find_outer_vertices(self):
+        edges = kmeans.find_outer_vertices(self.points)
         self.assertEqual(edges, (1, 9, 0, 2, 0, 9))
 
     def test_find_cluster_centroids(self):
-        means = self.kmeans.find_cluster_centroids()
+        means = kmeans.find_cluster_centroids(self.points, self.num_of_clusters)
         means_tuples = list(map(lambda point: tuple(point), means))  # convert list of Point objects to list of tuples
         self.assertEqual(len(means), self.num_of_clusters)
         self.assertTrue((1.5, 1.5, 1.0) in means_tuples)
@@ -40,35 +40,21 @@ class KmeansTest(unittest.TestCase):
     def test_calculate_distance(self):
         a = (3, 5, 8, 15)
         b = (2, 3, 4, 5)
-        distance = kmeans.KMeans.calculate_distance(a, b)
+        distance = kmeans.calculate_distance(a, b)
         self.assertEqual(distance, 11)
+
+    def test_generate_random_point(self):
+        vertices = (1, 2, 3, 4)
+        random_point = kmeans.generate_random_point(2, vertices)
+        self.assertGreaterEqual(random_point[0], 1)
+        self.assertLessEqual(random_point[0], 2)
+        self.assertGreaterEqual(random_point[1], 3)
+        self.assertLessEqual(random_point[1], 4)
 
     def test_calculate_centroid(self):
         points = [
             (1, 2, 3),
             (3, 4, 5),
         ]
-        centroids = kmeans.KMeans.calculate_centroid(points)
+        centroids = kmeans.calculate_centroid(points)
         self.assertEqual(centroids, (2, 3, 4))
-
-    def test_centroids_are_equal(self):
-        a = [
-            (1, 2, 3),
-            (3, 4, 5),
-        ]
-        b = [
-            (1, 2, 3),
-            (3, 4, 5),
-        ]
-        c = [
-            (1, 2, 3),
-            (3, 4, 6),
-        ]
-        d = [
-            (1, 2, 3),
-            (3, 4, 6),
-            (3, 4, 6),
-        ]
-        self.assertEqual(kmeans.KMeans.centroids_are_equal(a, b), True)
-        self.assertEqual(kmeans.KMeans.centroids_are_equal(a, c), False)
-        self.assertEqual(kmeans.KMeans.centroids_are_equal(a, d), False)
