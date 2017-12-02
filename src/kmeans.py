@@ -7,48 +7,59 @@ def find_cluster_centroids(points, k):
     """Runs an infinite loop which contains an iteration on the self.points to find the nearest mean"""
 
     dimension_count = len(points[0])
-    max_iterations = 100
     outer_vertices = find_outer_vertices(points)
 
-    centroids = generate_random_centroids(k, dimension_count, outer_vertices)
+    best_clusters = {generate_random_point(dimension_count, outer_vertices): [] for i in xrange(k)}
 
-    for i in xrange(max_iterations):
-        clusters = {}
+    while True:
+        old_clusters = assign_points_to_centroids(best_clusters.keys(), points)
 
-        for point in points:
-            best_distance = float("+inf")
-            best_centroid = None
+        new_clusters = recalculate_cluster_centroids(old_clusters)
 
-            for centroid in centroids:
-                distance = calculate_distance(centroid, point)
-                if distance < best_distance:
-                    best_distance = distance
-                    best_centroid = centroid
+        # if the points were grouped into a number of centroids that's less than k
+        # we need to generate random centroids to improve grouping
+        add_missing_centroids(k, new_clusters, dimension_count, outer_vertices)
 
-            if best_centroid not in clusters:
-                clusters[best_centroid] = []
+        if best_clusters == new_clusters:
+            return best_clusters
 
-            clusters[best_centroid].append(point)
-
-        new_centroids = [calculate_centroid(p) for p in clusters.values()]
-
-        if len(centroid) > len(new_centroids):
-            raise RuntimeError('Centroid length differs')
-
-        # for j in xrange(len(centroid) - len(new_centroids)):
-        #     new_centroids.append(generate_random_point())
-        # todo see if we need this
-
-        if centroids == new_centroids:
-            break
-
-        centroids = new_centroids
-    return centroids
+        best_clusters = new_clusters
 
 
-def generate_random_centroids(k, dimension_count, outer_vertices):
-    """Generates a random point (the centroid) for each cluster"""
-    return [generate_random_point(dimension_count, outer_vertices) for i in xrange(k)]
+def add_missing_centroids(k, new_clusters, dimension_count, outer_vertices):
+    for j in xrange(k - len(new_clusters)):
+        random_centroid = generate_random_point(dimension_count, outer_vertices)
+        new_clusters[random_centroid] = []
+
+
+def recalculate_cluster_centroids(clusters):
+    new_clusters = {}
+
+    for centroid, point_list in clusters.iteritems():
+        new_centroid = calculate_centroid(point_list)
+        new_clusters[new_centroid] = point_list
+
+    return new_clusters
+
+
+def assign_points_to_centroids(centroids, points):
+    clusters = {}
+
+    for point in points:
+        best_distance = float("+inf")
+        best_centroid = None
+
+        for centroid in centroids:
+            distance = calculate_distance(centroid, point)
+            if distance < best_distance:
+                best_distance, best_centroid = distance, centroid
+
+        if best_centroid not in clusters:
+            clusters[best_centroid] = []
+
+        clusters[best_centroid].append(point)
+
+    return clusters
 
 
 def calculate_centroid(points):

@@ -22,18 +22,35 @@ class KmeansTest(unittest.TestCase):
             (2, 2, 9),
             (2, 1, 7),
         ]
-        self.num_of_clusters = 3
+        self.k = 3
 
     def test_calculate_outer_vertices(self):
         edges = kmeans.find_outer_vertices(self.points)
         self.assertEqual(edges, (1, 9, 0, 2, 0, 9))
 
     def test_find_cluster_centroids(self):
-        centroids = kmeans.find_cluster_centroids(self.points, self.num_of_clusters)
-        self.assertEqual(len(centroids), self.num_of_clusters)
-        self.assertEqual(centroids[0], (8.5, 1.0, 1.0))
-        self.assertEqual(centroids[1], (1.5, 1.5, 8.0))
-        self.assertEqual(centroids[2], (1.5, 1.5, 1.0))
+        centroids = kmeans.find_cluster_centroids(self.points, self.k)
+        self.assertEqual(len(centroids), self.k)
+        self.assertDictEqual(centroids, {
+            (1.5, 1.5, 1.0): [
+                (1, 1, 0),
+                (1, 2, 2),
+                (2, 2, 2),
+                (2, 1, 0),
+            ],
+            (1.5, 1.5, 8.0): [
+                (1, 1, 7),
+                (1, 2, 9),
+                (2, 2, 9),
+                (2, 1, 7),
+            ],
+            (8.5, 1.0, 1.0): [
+                (8, 0, 0),
+                (8, 1, 2),
+                (9, 1, 0),
+                (9, 2, 2),
+            ],
+        })
 
     def test_calculate_distance(self):
         a = (3, 5, 8, 15)
