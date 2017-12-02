@@ -23,24 +23,22 @@ class KmeansTest(unittest.TestCase):
             (2, 1, 7),
         ]
         self.num_of_clusters = 3
-        self.kmeans = kmeans.KMeans(self.points, self.num_of_clusters)
 
     def test_calculate_outer_vertices(self):
-        edges = self.kmeans.find_outer_vertices()
+        edges = kmeans.find_outer_vertices(self.points)
         self.assertEqual(edges, (1, 9, 0, 2, 0, 9))
 
     def test_find_cluster_centroids(self):
-        centroids = self.kmeans.find_cluster_centroids()
-        centroid_tuples = list(map(lambda point: tuple(point), centroids))  # convert list of Point objects to list of tuples
+        centroids = kmeans.find_cluster_centroids(self.points, self.num_of_clusters)
         self.assertEqual(len(centroids), self.num_of_clusters)
-        self.assertTrue((1.5, 1.5, 1.0) in centroid_tuples)
-        self.assertTrue((8.5, 1.0, 1.0) in centroid_tuples)
-        self.assertTrue((1.5, 1.5, 8.0) in centroid_tuples)
+        self.assertEqual(centroids[0], (8.5, 1.0, 1.0))
+        self.assertEqual(centroids[1], (1.5, 1.5, 8.0))
+        self.assertEqual(centroids[2], (1.5, 1.5, 1.0))
 
     def test_calculate_distance(self):
         a = (3, 5, 8, 15)
         b = (2, 3, 4, 5)
-        distance = kmeans.KMeans.calculate_distance(a, b)
+        distance = kmeans.calculate_distance(a, b)
         self.assertEqual(distance, 11)
 
     def test_calculate_centroid(self):
@@ -48,5 +46,5 @@ class KmeansTest(unittest.TestCase):
             (1, 2, 3),
             (3, 4, 5),
         ]
-        centroids = self.kmeans.calculate_centroid(points)
+        centroids = kmeans.calculate_centroid(points)
         self.assertEqual(centroids, (2, 3, 4))

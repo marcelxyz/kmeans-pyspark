@@ -16,6 +16,16 @@ class ParserTest(unittest.TestCase):
         xml = '<user>'
         self.assertIsNone(parser.parse_xml_line(xml))
 
+    def test_extract_attributes(self):
+        xml = '<user id="19" date="  2009-01-12T19:07:38.647  " name="Tassos  " />'
+        values = parser.extract_attributes(xml, "user", ["date", "name"])
+        self.assertEqual(values, ("2009-01-12T19:07:38.647", "Tassos"))
+
+    def test_extract_attributes_casts_values(self):
+        xml = '<user id="19" rep="90050" year="2017" />'
+        values = parser.extract_attributes(xml, "user", ["id", "rep", "year"], int)
+        self.assertEqual(values, (19, 90050, 2017))
+
     def test_cleanup_xml(self):
         before = '<p>lol&^Cquot</p>'
         after = '<p>lol&quot</p>'
