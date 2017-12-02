@@ -1,4 +1,5 @@
 from pyspark import SparkContext
+from glob import glob
 import random
 import os.path
 import spark_jobs
@@ -11,20 +12,18 @@ def src_dir():
 
 def localise_path(path):
     local_path = src_dir() + '../' + path
-    if os.path.exists(local_path):
+    if not os.path.isabs(path) and os.path.exists(local_path):
         return local_path
     return path
 
 
 def run_job(sc, job_name, file_path, k):
-    jobs = {
-        'user_upvotes_downvotes': spark_jobs.user_upvotes_downvotes
-    }
+    if not hasattr(spark_jobs, job_name):
+        raise RuntimeError('Job "%s" not found in module spark_jobs' % job_name)
 
-    if job_name not in jobs:
-        raise RuntimeError('Job %s not found' % job_name)
+    fn = getattr(spark_jobs, job_name)
 
-    return jobs[job_name](sc.textFile(localise_path(file_path)), k)
+    return fn(sc.textFile(localise_path(file_path)), k)
 
 
 if __name__ == '__main__':
@@ -33,10 +32,10 @@ if __name__ == '__main__':
         sys.exit(0)
 
     random.seed(1)
-    sc = SparkContext()
+    files = glob(src_dir() + '*.py')
+
+    sc = SparkContext(pyFiles=files)
     sc.setLogLevel("ERROR")
-    sc.addFile(src_dir() + 'parser.py')
-    sc.addFile(src_dir() + 'kmeans.py')
-    sc.addFile(src_dir() + 'spark_jobs.py')
+
     result = run_job(sc, sys.argv[1], sys.argv[2], int(sys.argv[3]))
     print(result.keys())
