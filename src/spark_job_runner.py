@@ -6,12 +6,12 @@ import spark_jobs
 import sys
 
 
-def src_dir():
+def current_dir():
     return os.path.dirname(os.path.realpath(__file__)) + '/'
 
 
 def localise_path(path):
-    local_path = src_dir() + '../' + path
+    local_path = current_dir() + '../' + path
     if not os.path.isabs(path) and os.path.exists(local_path):
         return local_path
     return path
@@ -32,7 +32,7 @@ if __name__ == '__main__':
         sys.exit(0)
 
     random.seed(1)
-    files = glob(src_dir() + '*.py')
+    files = glob(current_dir() + '*.py')
 
     sc = SparkContext(pyFiles=files)
     sc.setLogLevel("ERROR")

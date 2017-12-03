@@ -9,9 +9,17 @@ class SparkJobTest(unittest.TestCase):
         random.seed(1)
         self.sc = SparkContext(master="local")
 
+    def tearDown(self):
+        self.sc.stop()
+
+    @staticmethod
+    def grouped_rdd_to_dict(rdd):
+        return {k: list(v) for (k, v) in rdd}
+
     def test_user_upvotes_downvotes(self):
         result = spark_job_runner.run_job(self.sc, 'user_upvotes_downvotes', 'tests/fixtures/users.xml', 3)
-        self.assertDictEqual(result, {
+        data = self.grouped_rdd_to_dict(result.collect())
+        self.assertDictEqual(data, {
             (1.5, 1.5, 1.0): [
                 (1, 1, 0),
                 (1, 2, 2),
