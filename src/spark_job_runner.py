@@ -21,9 +21,9 @@ def run_job(sc, job_name, file_path, k):
     if not hasattr(spark_jobs, job_name):
         raise RuntimeError('Job "%s" not found in module spark_jobs' % job_name)
 
-    fn = getattr(spark_jobs, job_name)
+    job = getattr(spark_jobs, job_name)
 
-    return fn(sc.textFile(localise_path(file_path)), k)
+    return job(sc.textFile(localise_path(file_path)), k)
 
 
 if __name__ == '__main__':
