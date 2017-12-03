@@ -35,7 +35,7 @@ if __name__ == '__main__':
     files = glob(current_dir() + '*.py')
 
     sc = SparkContext(pyFiles=files)
-    sc.setLogLevel("ERROR")
+    sc.setLogLevel("WARN")
 
     result = run_job(sc, sys.argv[1], sys.argv[2], int(sys.argv[3]))
-    print(result.keys())
+    print(result.takeSample(False, 3))

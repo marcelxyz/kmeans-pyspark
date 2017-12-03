@@ -31,7 +31,7 @@ class KmeansTest(unittest.TestCase):
 
     @staticmethod
     def grouped_rdd_to_dict(rdd):
-        return {k: list(v) for (k, v) in rdd}
+        return {k: v for (k, v) in rdd}
 
     def test_find_outer_vertices(self):
         edges = kmeans.find_outer_vertices(self.points)
@@ -43,8 +43,7 @@ class KmeansTest(unittest.TestCase):
             (1.5, 1.5, 8.0): [],
             (8.5, 1.0, 1.0): [],
         }
-        result = kmeans.assign_points_to_centroids(centroids, self.points).collect()
-        data = self.grouped_rdd_to_dict(result)
+        data = kmeans.assign_points_to_centroids(centroids, self.points).collectAsMap()
         self.assertDictEqual(data, {
             (1.5, 1.5, 1.0): [
                 (1, 1, 0),
@@ -67,33 +66,26 @@ class KmeansTest(unittest.TestCase):
         })
 
     def test_recalculate_cluster_centroids(self):
-        centroids = {
-            (1.5, 1.5, 1.0): [],
-            (1.5, 1.5, 8.0): [],
-            (8.5, 1.0, 1.0): [],
-        }
-        clusters = kmeans.assign_points_to_centroids(centroids, self.points)
+        centroids = [
+            (
+                (10, 11), [(1, 2), (3, 4)]
+            ),
+            (
+                (12, 13), [(2, 3), (4, 5), (6, 7)]
+            ),
+        ]
+        clusters = self.sc.parallelize(centroids).groupByKey().flatMapValues(lambda x: x)
 
-        result = kmeans.recalculate_cluster_centroids(clusters)
-        data = self.grouped_rdd_to_dict(result.collect())
+        data = kmeans.recalculate_cluster_centroids(clusters).collectAsMap()
         self.assertDictEqual(data, {
-            (1.5, 1.5, 1.0): [
-                (1, 1, 0),
-                (1, 2, 2),
-                (2, 2, 2),
-                (2, 1, 0),
+            (2, 3): [
+                (1, 2),
+                (3, 4),
             ],
-            (1.5, 1.5, 8.0): [
-                (1, 1, 7),
-                (1, 2, 9),
-                (2, 2, 9),
-                (2, 1, 7),
-            ],
-            (8.5, 1.0, 1.0): [
-                (8, 0, 0),
-                (8, 1, 2),
-                (9, 1, 0),
-                (9, 2, 2),
+            (4, 5): [
+                (2, 3),
+                (4, 5),
+                (6, 7),
             ],
         })
 
@@ -106,8 +98,7 @@ class KmeansTest(unittest.TestCase):
         self.assertEqual(centroids, (2, 3, 4))
 
     def test_find_cluster_centroids(self):
-        result = kmeans.find_cluster_centroids(self.points, self.k)
-        centroids = self.grouped_rdd_to_dict(result.collect())
+        centroids = kmeans.find_cluster_centroids(self.points, self.k).collectAsMap()
         self.assertEqual(len(centroids), self.k)
         self.assertDictEqual(centroids, {
             (1.5, 1.5, 1.0): [

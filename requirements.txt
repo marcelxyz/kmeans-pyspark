@@ -2,3 +2,4 @@ pyspark
 matplotlib
 numpy
 xmltodict
+psutil

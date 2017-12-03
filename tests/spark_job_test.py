@@ -12,13 +12,9 @@ class SparkJobTest(unittest.TestCase):
     def tearDown(self):
         self.sc.stop()
 
-    @staticmethod
-    def grouped_rdd_to_dict(rdd):
-        return {k: list(v) for (k, v) in rdd}
-
     def test_user_upvotes_downvotes(self):
         result = spark_job_runner.run_job(self.sc, 'user_upvotes_downvotes', 'tests/fixtures/users.xml', 3)
-        data = self.grouped_rdd_to_dict(result.collect())
+        data = result.collectAsMap()
         self.assertDictEqual(data, {
             (1.5, 1.5, 1.0): [
                 (1, 1, 0),

@@ -15,7 +15,7 @@ def find_cluster_centroids(points, k):
     outer_vertices = find_outer_vertices(points)
 
     random_clusters = [(generate_random_point(dimension_count, outer_vertices), []) for i in xrange(k)]
-    best_clusters = points.context.parallelize(random_clusters).groupByKey()
+    best_clusters = points.context.parallelize(random_clusters).groupByKey().flatMapValues(lambda a: a)
 
     while True:
         old_clusters = assign_points_to_centroids(best_clusters.keys().collect(), points)
@@ -40,7 +40,7 @@ def add_missing_centroids(k, new_clusters, dimension_count, outer_vertices):
 
     random_centroids = [(generate_random_point(dimension_count, outer_vertices), []) for i in xrange(k - cluster_count)]
 
-    return new_clusters.context.parallelize(random_centroids).groupByKey().union(new_clusters)
+    return new_clusters.context.parallelize(random_centroids).groupByKey().flatMapValues(lambda a: a).union(new_clusters)
 
 
 def recalculate_cluster_centroids(clusters):
@@ -57,9 +57,9 @@ def assign_points_to_centroids(centroids, points):
 
     :param centroids: Dict of centroid to point list mappings
     :param points: RDD of all points
-    :return: PipelinedRDD containing poin lists grouped by centroid
+    :return: PipelinedRDD containing point lists grouped by centroid
     """
-    return points.groupBy(lambda p: find_closest_centroid(p, centroids))
+    return points.groupBy(lambda p: find_closest_centroid(p, centroids)).map(lambda c: (c[0], list(c[1])))
 
 
 def find_closest_centroid(point, centroids):
