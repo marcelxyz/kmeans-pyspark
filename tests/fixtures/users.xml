@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<users>
+    <row Reputation="1" UpVotes="1" DownVotes="0" />
+    <row Reputation="1" UpVotes="2" DownVotes="2" />
+    <row Reputation="2" UpVotes="2" DownVotes="2" />
+    <row Reputation="2" UpVotes="1" DownVotes="0" />
+
+    <row Reputation="1" UpVotes="1" DownVotes="7" />
+    <row Reputation="1" UpVotes="2" DownVotes="9" />
+    <row Reputation="2" UpVotes="2" DownVotes="9" />
+    <row Reputation="2" UpVotes="1" DownVotes="7" />
+
+    <row Reputation="8" UpVotes="0" DownVotes="0" />
+    <row Reputation="8" UpVotes="1" DownVotes="2" />
+    <row Reputation="9" UpVotes="1" DownVotes="0" />
+    <row Reputation="9" UpVotes="2" DownVotes="2" />
+</users>
