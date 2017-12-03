@@ -28,7 +28,7 @@ def extract_attributes(xml, attribute_names, cast=str):
 
 def parse_xml_line(line):
     try:
-        line = cleanup_xml(line.strip())
+        line = cleanup_xml(line.encode('utf-8').strip())
         return ET.fromstring(line)
     except ET.ParseError as e:
         # print(e, line.strip())
