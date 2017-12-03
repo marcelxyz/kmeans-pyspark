@@ -4,15 +4,13 @@
 
 Make sure you have Python 2.7 installed along with pip. Then run:
 
-```bash
+```
 pip install -r requirements.txt
 ```
 
-
-
 ### Running jobs
 
-```bash
+```
 python src/spark_job_runner.py <job_name> <input_file_path> <k>
 ```
 
@@ -24,13 +22,15 @@ With the following params:
 
 For example:
 
-```bash
+```
 python src/spark_job_runner.py user_upvotes_downvotes tests/fixtures/users.xml 3
 ```
 
 ### Adding new jobs
 
-All the jobs are dynamically loaded from the `src/spark_jobs.py` file. Add *ONE* function there for each job you require. If you need more than one function, or your function is more than 10 lines or so, then create a separate module file for it. This will keep the `spark_jobs.py` file fairly small and easy to understand.
+All the jobs are dynamically loaded from the `src/spark_jobs.py` file. Add **ONE** function there for each job you require.
+
+If you need more than one function or your function is more than approx. 10 lines, then create a separate module file for it. This will keep the `spark_jobs.py` file fairly small and easy to understand.
 
 ### Debugging
 
@@ -46,8 +46,8 @@ We don't have the required permissions to install custom modules on the QM serve
 
 To see a list of modules installed on QM's servers, logon to an ITL machine remotely and do `pip list`. This lists all custom modules that are installed.
 
-Submitting a job on the cluster:
+Submitting a job on the cluster is done using this command:
 
-```bash
+```
 spark-submit src/spark_job_runner.py <job_name> <input_file_path> <k>
 ```
