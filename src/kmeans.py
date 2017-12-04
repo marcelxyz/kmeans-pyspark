@@ -33,7 +33,7 @@ def find_cluster_centroids(points, k):
 
 
 def add_missing_centroids(k, new_clusters, dimension_count, outer_vertices):
-    cluster_count = new_clusters.count()
+    cluster_count = new_clusters.keys().count()
 
     if cluster_count == k:
         return new_clusters
