@@ -10,6 +10,7 @@ def find_cluster_centroids(points, k):
     :param k: the number of clusters to generate
     :return: dict mapping centroid coordinates to the points that belong to it
     """
+    points.cache()
 
     dimension_count = len(points.first())
     outer_vertices = find_outer_vertices(points)
@@ -35,6 +36,9 @@ def find_cluster_centroids(points, k):
 
 
 def add_missing_centroids(k, new_clusters, dimension_count, outer_vertices, cluster_count):
+    if cluster_count == k:
+        return new_clusters
+
     random_clusters = [(generate_random_point(dimension_count, outer_vertices), []) for i in xrange(k - cluster_count)]
 
     return parallelize_clusters(new_clusters.context, random_clusters).union(new_clusters)
