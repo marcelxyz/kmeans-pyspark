@@ -15,30 +15,33 @@ def find_cluster_centroids(points, k):
     outer_vertices = find_outer_vertices(points)
 
     random_clusters = [(generate_random_point(dimension_count, outer_vertices), []) for i in xrange(k)]
-    best_clusters = points.context.parallelize(random_clusters).groupByKey().flatMapValues(lambda a: a)
+    best_clusters = parallelize_clusters(points.context, random_clusters)
 
     while True:
         old_clusters = assign_points_to_centroids(best_clusters.keys().collect(), points)
 
         new_clusters = recalculate_cluster_centroids(old_clusters)
 
-        # new_cluster_keys = new_clusters.keys().collect()
-
-        # if the points were grouped into a number of centroids that's less than k
-        # we need to generate random centroids to have k
-        # if len(new_cluster_keys) < k:
-        #     new_clusters = add_missing_centroids(k, new_clusters, dimension_count, outer_vertices, len(new_cluster_keys))
+        new_cluster_keys = new_clusters.keys().collect()
 
         if best_clusters.keys().collect() == new_clusters.keys().collect():
             return best_clusters
+
+        # if the points were grouped into a number of centroids that's less than k
+        # we need to generate random centroids to have k
+        new_clusters = add_missing_centroids(k, new_clusters, dimension_count, outer_vertices, len(new_cluster_keys))
 
         best_clusters = new_clusters
 
 
 def add_missing_centroids(k, new_clusters, dimension_count, outer_vertices, cluster_count):
-    random_centroids = [(generate_random_point(dimension_count, outer_vertices), []) for i in xrange(k - cluster_count)]
+    random_clusters = [(generate_random_point(dimension_count, outer_vertices), []) for i in xrange(k - cluster_count)]
 
-    return new_clusters.context.parallelize(random_centroids).groupByKey().flatMapValues(lambda a: a).union(new_clusters)
+    return parallelize_clusters(new_clusters.context, random_clusters).union(new_clusters)
+
+
+def parallelize_clusters(context, clusters):
+    return context.parallelize(clusters).groupByKey().flatMapValues(lambda a: a)
 
 
 def recalculate_cluster_centroids(clusters):
