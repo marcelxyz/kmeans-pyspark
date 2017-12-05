@@ -25,7 +25,7 @@ Params:
 For example:
 
 ```
-python src/index.py user_upvotes_downvotes tests/fixtures/users.xml 3
+python src/index.py user__reputation__to__upvotes_cast tests/fixtures/users.xml 3
 ```
 
 ### Adding new jobs

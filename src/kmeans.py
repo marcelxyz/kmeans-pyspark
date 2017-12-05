@@ -15,6 +15,7 @@ def find_cluster_centroids(points, k):
     outer_vertices = find_outer_vertices(points)
 
     random_clusters = [(generate_random_point(dimension_count, outer_vertices), []) for i in xrange(k)]
+    # random_clusters[0] = ((9999, 9999, 9999), [])
     best_clusters = points.context.parallelize(random_clusters).groupByKey().flatMapValues(lambda a: a)
 
     while True:
@@ -23,7 +24,7 @@ def find_cluster_centroids(points, k):
         new_clusters = recalculate_cluster_centroids(old_clusters)
 
         # if the points were grouped into a number of centroids that's less than k
-        # we need to generate random centroids to improve grouping
+        # we need to generate random centroids to have k
         new_clusters = add_missing_centroids(k, new_clusters, dimension_count, outer_vertices)
 
         if best_clusters.keys().collect() == new_clusters.keys().collect():
@@ -33,7 +34,7 @@ def find_cluster_centroids(points, k):
 
 
 def add_missing_centroids(k, new_clusters, dimension_count, outer_vertices):
-    cluster_count = new_clusters.keys().count()
+    cluster_count = new_clusters.map(lambda cluster: cluster[0]).count()
 
     if cluster_count == k:
         return new_clusters
