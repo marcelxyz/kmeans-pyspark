@@ -2,15 +2,16 @@ import kmeans
 import parser
 
 
-def user_upvotes_downvotes(user_lines, k):
+def user__reputation__to__upvotes_cast(k, user_lines):
     """
+    Classifies users based on their reputation score and number of upvotes they cast.
 
-    :param user_lines:
-    :param k:
-    :return: PythonRDD
+    :param k: Number of clusters
+    :param user_lines: PythonRDD containing the lines in the users XML file
+    :return: PythonRDD of results
     """
     result = user_lines\
-        .map(lambda line: parser.extract_attributes(line, ['Reputation', 'UpVotes', 'DownVotes'], int))\
+        .map(lambda line: parser.extract_attributes(line, ['Reputation', 'UpVotes'], int))\
         .filter(lambda a: any(a))
 
     return kmeans.find_cluster_centroids(result, k)

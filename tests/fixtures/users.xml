@@ -5,10 +5,10 @@
     <row Reputation="2" UpVotes="2" DownVotes="2" />
     <row Reputation="2" UpVotes="1" DownVotes="0" />
 
-    <row Reputation="1" UpVotes="1" DownVotes="7" />
-    <row Reputation="1" UpVotes="2" DownVotes="9" />
-    <row Reputation="2" UpVotes="2" DownVotes="9" />
-    <row Reputation="2" UpVotes="1" DownVotes="7" />
+    <row Reputation="2" UpVotes="8" DownVotes="7" />
+    <row Reputation="2" UpVotes="8" DownVotes="9" />
+    <row Reputation="1" UpVotes="9" DownVotes="9" />
+    <row Reputation="1" UpVotes="9" DownVotes="7" />
 
     <row Reputation="8" UpVotes="0" DownVotes="0" />
     <row Reputation="8" UpVotes="1" DownVotes="2" />

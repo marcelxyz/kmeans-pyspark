@@ -10,20 +10,24 @@ pip install -r requirements.txt
 
 ### Running jobs
 
+All jobs are ran using the central job runner module - `src/index.py`. You shouldn't need to edit this file at all.
+
 ```
-python src/spark_job_runner.py <job_name> <input_file_path> <k>
+python src/index.py <job_name> <k> <file1> <file2>
 ```
 
-With the following params:
+Params:
 
 * `<job_name>` the name of your job function as defined in `src/spark_jobs.py`
-* `<input_file_path>` the file path to the data file (this can either be an absolute path or a local path in the project)
 * `<k>` the number of clusters to generate
+* `<file1>` the file path to the data file (this can either be an absolute path or a local path in the project)
+
+The jobs can take more than one file. Those should just be appended to the command.
 
 For example:
 
 ```
-python src/spark_job_runner.py user_upvotes_downvotes tests/fixtures/users.xml 3
+python src/index.py user__reputation__to__upvotes_cast 3 tests/fixtures/users.xml
 ```
 
 ### Adding new jobs
@@ -31,6 +35,27 @@ python src/spark_job_runner.py user_upvotes_downvotes tests/fixtures/users.xml 3
 All the jobs are dynamically loaded from the `src/spark_jobs.py` file. Add **ONE** function there for each job you require.
 
 If you need more than one function or your function is more than approx. 10 lines, then create a separate module file for it. This will keep the `spark_jobs.py` file fairly small and easy to understand.
+
+The interface for job definitions is as follows:
+
+```python
+def function(k, file1 [, file2[, file3, ...]]
+```
+
+The function **must** take at least the `k` and `file1` arguments (which map to the values passed via the CLI). It can take more files if necessary (again, those need to be provided via the CLI when called).
+
+For example:
+
+```python
+def user_reputation__to__post_length(k, users_rdd, posts_rdd):
+    # do something great here
+```
+
+And then execute using the command:
+
+```python
+python src/index.py user_reputation__to__post_length 5 /data/users.xml /data/posts.xml
+```
 
 ### Debugging
 
@@ -49,5 +74,5 @@ To see a list of modules installed on QM's servers, logon to an ITL machine remo
 Submitting a job on the cluster is done using this command:
 
 ```
-spark-submit src/spark_job_runner.py <job_name> <input_file_path> <k>
+spark-submit src/index.py <job_name> <k> <input_file_path>
 ```
