@@ -15,7 +15,6 @@ def find_cluster_centroids(points, k):
     outer_vertices = find_outer_vertices(points)
 
     random_clusters = [(generate_random_point(dimension_count, outer_vertices), []) for i in xrange(k)]
-    # random_clusters[0] = ((9999, 9999, 9999), [])
     best_clusters = points.context.parallelize(random_clusters).groupByKey().flatMapValues(lambda a: a)
 
     while True:
@@ -23,22 +22,19 @@ def find_cluster_centroids(points, k):
 
         new_clusters = recalculate_cluster_centroids(old_clusters)
 
+        new_cluster_keys = new_clusters.keys().collect()
+
         # if the points were grouped into a number of centroids that's less than k
         # we need to generate random centroids to have k
-        new_clusters = add_missing_centroids(k, new_clusters, dimension_count, outer_vertices)
-
-        if best_clusters.keys().collect() == new_clusters.keys().collect():
+        if len(new_cluster_keys) < k:
+            new_clusters = add_missing_centroids(k, new_clusters, dimension_count, outer_vertices, len(new_cluster_keys))
+        elif best_clusters.keys().collect() == new_cluster_keys:
             return best_clusters
 
         best_clusters = new_clusters
 
 
-def add_missing_centroids(k, new_clusters, dimension_count, outer_vertices):
-    cluster_count = new_clusters.map(lambda cluster: cluster[0]).count()
-
-    if cluster_count == k:
-        return new_clusters
-
+def add_missing_centroids(k, new_clusters, dimension_count, outer_vertices, cluster_count):
     random_centroids = [(generate_random_point(dimension_count, outer_vertices), []) for i in xrange(k - cluster_count)]
 
     return new_clusters.context.parallelize(random_centroids).groupByKey().flatMapValues(lambda a: a).union(new_clusters)
@@ -60,7 +56,9 @@ def assign_points_to_centroids(centroids, points):
     :param points: RDD of all points
     :return: PipelinedRDD containing point lists grouped by centroid
     """
-    return points.groupBy(lambda p: find_closest_centroid(p, centroids)).map(lambda c: (c[0], list(c[1])))
+    return points\
+        .groupBy(lambda point: find_closest_centroid(point, centroids))\
+        .map(lambda cluster: (cluster[0], list(cluster[1])))
 
 
 def find_closest_centroid(point, centroids):

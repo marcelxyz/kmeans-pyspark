@@ -29,10 +29,6 @@ class KmeansTest(unittest.TestCase):
     def tearDown(self):
         self.sc.stop()
 
-    @staticmethod
-    def grouped_rdd_to_dict(rdd):
-        return {k: v for (k, v) in rdd}
-
     def test_find_outer_vertices(self):
         edges = kmeans.find_outer_vertices(self.points)
         self.assertEqual(edges, (1, 9, 0, 2, 0, 9))
