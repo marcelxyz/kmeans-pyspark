@@ -10,11 +10,13 @@ pip install -r requirements.txt
 
 ### Running jobs
 
+All jobs are ran using the central job runner module - `src/index.py`. You shouldn't need to edit this file at all.
+
 ```
 python src/index.py <job_name> <input_file_path> <k>
 ```
 
-With the following params:
+Params:
 
 * `<job_name>` the name of your job function as defined in `src/spark_jobs.py`
 * `<input_file_path>` the file path to the data file (this can either be an absolute path or a local path in the project)
@@ -31,6 +33,27 @@ python src/index.py user_upvotes_downvotes tests/fixtures/users.xml 3
 All the jobs are dynamically loaded from the `src/spark_jobs.py` file. Add **ONE** function there for each job you require.
 
 If you need more than one function or your function is more than approx. 10 lines, then create a separate module file for it. This will keep the `spark_jobs.py` file fairly small and easy to understand.
+
+The interface for job definitions is as follows:
+
+```python
+def function(k, file1 [, file2[, file3, ...]]
+```
+
+The function **must** take at least the `k` and `file1` arguments (which map to the values passed via the CLI). It can take more files if necessary (again, those need to be provided via the CLI when called).
+
+For example:
+
+```python
+def user_reputation_to_post_length(k, users_rdd, posts_rdd):
+    # do something great here
+```
+
+And then execute using the command:
+
+```python
+python src/index.py user_reputation_to_post_length /data/users.xml /data/posts.xml 5
+```
 
 ### Debugging
 
