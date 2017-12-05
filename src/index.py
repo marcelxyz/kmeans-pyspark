@@ -17,18 +17,22 @@ def localise_path(path):
     return path
 
 
-def run_job(sc, job_name, file_path, k):
+def load_files(sc, paths):
+    return map(lambda path: sc.textFile(localise_path(path)), paths)
+
+
+def run_job(sc, job_name, k, file_paths):
     if not hasattr(spark_jobs, job_name):
         raise RuntimeError('Job "%s" not found in module spark_jobs' % job_name)
 
     job = getattr(spark_jobs, job_name)
 
-    return job(sc.textFile(localise_path(file_path)), k)
+    return job(k, *load_files(sc, file_paths))
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 4:
-        print("Usage: job_runner.py <job_name> <input_file_path> <k>")
+    if len(sys.argv) < 4:
+        print("Usage: index.py <job_name> <k> <input_file_path> [<input_file_path2> <input_file_path3> ... ]")
         sys.exit(0)
 
     random.seed(1)
@@ -37,5 +41,5 @@ if __name__ == '__main__':
     sc = SparkContext(pyFiles=files)
     sc.setLogLevel("WARN")
 
-    result = run_job(sc, sys.argv[1], sys.argv[2], int(sys.argv[3]))
+    result = run_job(sc, sys.argv[1], int(sys.argv[2]), sys.argv[3:])
     print(result.takeSample(False, 3))

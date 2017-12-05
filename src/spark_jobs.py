@@ -2,11 +2,11 @@ import kmeans
 import parser
 
 
-def user_upvotes_downvotes(user_lines, k):
+def user_upvotes_downvotes(k, user_lines):
     """
 
-    :param user_lines:
     :param k:
+    :param user_lines:
     :return: PythonRDD
     """
     result = user_lines\

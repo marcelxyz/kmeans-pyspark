@@ -1,7 +1,7 @@
 import random
 import unittest
 from pyspark import SparkContext
-import job_runner
+import index
 
 
 class SparkJobTest(unittest.TestCase):
@@ -13,7 +13,7 @@ class SparkJobTest(unittest.TestCase):
         self.sc.stop()
 
     def test_user_upvotes_downvotes(self):
-        result = job_runner.run_job(self.sc, 'user_upvotes_downvotes', 'tests/fixtures/users.xml', 3)
+        result = index.run_job(self.sc, 'user_upvotes_downvotes', 3, ['tests/fixtures/users.xml'])
         data = result.collectAsMap()
         self.assertDictEqual(data, {
             (1.5, 1.5, 1.0): [
