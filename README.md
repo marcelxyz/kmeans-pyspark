@@ -11,7 +11,7 @@ pip install -r requirements.txt
 ### Running jobs
 
 ```
-python src/spark_job_runner.py <job_name> <input_file_path> <k>
+python src/job_runner.py <job_name> <input_file_path> <k>
 ```
 
 With the following params:
@@ -23,7 +23,7 @@ With the following params:
 For example:
 
 ```
-python src/spark_job_runner.py user_upvotes_downvotes tests/fixtures/users.xml 3
+python src/job_runner.py user_upvotes_downvotes tests/fixtures/users.xml 3
 ```
 
 ### Adding new jobs
@@ -49,5 +49,5 @@ To see a list of modules installed on QM's servers, logon to an ITL machine remo
 Submitting a job on the cluster is done using this command:
 
 ```
-spark-submit src/spark_job_runner.py <job_name> <input_file_path> <k>
+spark-submit src/job_runner.py <job_name> <input_file_path> <k>
 ```

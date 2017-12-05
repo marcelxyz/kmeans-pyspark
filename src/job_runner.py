@@ -28,7 +28,7 @@ def run_job(sc, job_name, file_path, k):
 
 if __name__ == '__main__':
     if len(sys.argv) != 4:
-        print("Usage: spark_job_runner.py <job_name> <input_file_path> <k>")
+        print("Usage: job_runner.py <job_name> <input_file_path> <k>")
         sys.exit(0)
 
     random.seed(1)
