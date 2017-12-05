@@ -22,13 +22,14 @@ def find_cluster_centroids(points, k):
 
         new_clusters = recalculate_cluster_centroids(old_clusters)
 
-        new_cluster_keys = new_clusters.keys().collect()
+        # new_cluster_keys = new_clusters.keys().collect()
 
         # if the points were grouped into a number of centroids that's less than k
         # we need to generate random centroids to have k
-        if len(new_cluster_keys) < k:
-            new_clusters = add_missing_centroids(k, new_clusters, dimension_count, outer_vertices, len(new_cluster_keys))
-        elif best_clusters.keys().collect() == new_cluster_keys:
+        # if len(new_cluster_keys) < k:
+        #     new_clusters = add_missing_centroids(k, new_clusters, dimension_count, outer_vertices, len(new_cluster_keys))
+
+        if best_clusters.keys().collect() == new_clusters.keys().collect():
             return best_clusters
 
         best_clusters = new_clusters
