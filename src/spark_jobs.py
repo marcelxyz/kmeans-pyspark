@@ -1,5 +1,5 @@
-import kmeans
-import parser
+from clustering import KMeans
+import xml_parser
 
 
 def user__reputation__to__upvotes_cast(k, user_lines):
@@ -11,7 +11,7 @@ def user__reputation__to__upvotes_cast(k, user_lines):
     :return: PythonRDD of results
     """
     result = user_lines\
-        .map(lambda line: parser.extract_attributes(line, ['Reputation', 'UpVotes'], int))\
+        .map(lambda line: xml_parser.extract_attributes(line, ['Reputation', 'UpVotes'], int))\
         .filter(lambda a: any(a))
 
-    return kmeans.fit(result, k)
+    return KMeans(k).fit(result)
