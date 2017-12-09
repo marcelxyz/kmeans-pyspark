@@ -3,7 +3,7 @@ import random
 import numpy
 
 
-def find_cluster_centroids(points, k):
+def fit(points, k):
     """Runs an infinite loop which contains an iteration on the self.points to find the nearest mean.
 
     :param points: RDD containing the points as tuples

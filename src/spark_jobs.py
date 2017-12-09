@@ -14,4 +14,4 @@ def user__reputation__to__upvotes_cast(k, user_lines):
         .map(lambda line: parser.extract_attributes(line, ['Reputation', 'UpVotes'], int))\
         .filter(lambda a: any(a))
 
-    return kmeans.find_cluster_centroids(result, k)
+    return kmeans.fit(result, k)

@@ -43,3 +43,5 @@ if __name__ == '__main__':
 
     result = run_job(sc, sys.argv[1], int(sys.argv[2]), sys.argv[3:])
     print(result.takeSample(False, 3))
+
+    sc.stop()

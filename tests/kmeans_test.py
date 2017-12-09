@@ -94,7 +94,7 @@ class KmeansTest(unittest.TestCase):
         self.assertEqual(centroids, (2, 3, 4))
 
     def test_find_cluster_centroids(self):
-        centroids = kmeans.find_cluster_centroids(self.points, self.k).collectAsMap()
+        centroids = kmeans.fit(self.points, self.k).collectAsMap()
         self.assertEqual(len(centroids), self.k)
         self.assertDictEqual(centroids, {
             (8.5, 1.0, 1.0): (4, 1.3090169943749475),
