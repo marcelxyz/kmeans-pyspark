@@ -5,9 +5,8 @@ import random
 import os
 import spark_jobs
 import sys
-import plotter
+# import plotter
 import pickle
-import json
 
 
 def current_dir():
