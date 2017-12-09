@@ -98,9 +98,24 @@ class ClusteringTest(unittest.TestCase):
         centroids = self.kmeans.fit(self.points).collectAsMap()
         self.assertEqual(len(centroids), self.k)
         self.assertDictEqual(centroids, {
-            (8.5, 1.0, 1.0): (4, 1.3090169943749475),
-            (1.5, 1.5, 8.0): (4, 1.2247448713915889),
-            (1.5, 1.5, 1.0): (4, 1.2247448713915889),
+            (1.5, 1.5, 1.0): [
+                (1, 1, 0),
+                (1, 2, 2),
+                (2, 2, 2),
+                (2, 1, 0),
+            ],
+            (1.5, 1.5, 8.0): [
+                (1, 1, 7),
+                (1, 2, 9),
+                (2, 2, 9),
+                (2, 1, 7),
+            ],
+            (8.5, 1.0, 1.0): [
+                (8, 0, 0),
+                (8, 1, 2),
+                (9, 1, 0),
+                (9, 2, 2),
+            ],
         })
 
     def test_calculate_distance(self):

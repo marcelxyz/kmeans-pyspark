@@ -38,31 +38,13 @@ class KMeans:
             new_cluster_keys = new_clusters.keys().collect()
 
             if best_clusters.keys().collect() == new_clusters.keys().collect():
-                return self.map_clusters_for_output(best_clusters)
+                return best_clusters
 
             # if the points were grouped into a number of centroids that's less than k
             # we need to generate random centroids to have k
             new_clusters = self.add_missing_centroids(self.k, new_clusters, dimension_count, outer_vertices, len(new_cluster_keys))
 
             best_clusters = new_clusters
-
-    def map_clusters_for_output(self, best_clusters):
-        """
-        Maps the RDD containing the cluster mappings to the following format:
-
-        [
-            (centroid, num_of_points, average_distance_to_centroid)
-        ]
-
-        :param best_clusters: PipelinedRDD of centroid -> point mappings
-        :return: PipelinedRDD
-        """
-        return best_clusters.map(lambda cluster: (
-            cluster[0], (
-                len(cluster[1]),
-                self.calculate_average_distance(cluster[0], cluster[1])
-            )
-        ))
 
     def add_missing_centroids(self, k, new_clusters, dimension_count, outer_vertices, cluster_count):
         if cluster_count == k:
