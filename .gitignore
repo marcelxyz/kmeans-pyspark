@@ -3,3 +3,5 @@ __pycache__
 derby.log
 metastore_db
 *.pyc
+output
+.DS_Store

@@ -1,9 +1,11 @@
 from pyspark import SparkContext
 from glob import glob
+from datetime import datetime
 import random
-import os.path
+import os
 import spark_jobs
 import sys
+import plotter
 
 
 def current_dir():
@@ -21,13 +23,39 @@ def load_files(sc, paths):
     return map(lambda path: sc.textFile(localise_path(path)), paths)
 
 
+def make_dir(job_name):
+    output_path = current_dir() + '../output/'
+    if not os.path.isdir(output_path):
+        os.mkdir(output_path)
+
+    output_path += job_name
+    if not os.path.isdir(output_path):
+        os.mkdir(output_path)
+
+    output_path += '/' + str(datetime.now()) + '/'
+    if not os.path.isdir(output_path):
+        os.mkdir(output_path)
+
+    return output_path
+
+
+def save_result(job_name, result):
+    output_path = make_dir(job_name)
+    plotter.generate_distribution_plot(result, output_path)
+    plotter.generate_scatter_plot(result, output_path)
+    plotter.generate_bubble_plot(result, output_path)
+    plotter.generate_pie_plot(result, output_path)
+
+
 def run_job(sc, job_name, k, file_paths):
     if not hasattr(spark_jobs, job_name):
         raise RuntimeError('Job "%s" not found in module spark_jobs' % job_name)
 
     job = getattr(spark_jobs, job_name)
 
-    return job(k, *load_files(sc, file_paths))
+    result = job(k, *load_files(sc, file_paths))
+
+    save_result(job_name, result.collectAsMap())
 
 
 if __name__ == '__main__':
@@ -41,7 +69,6 @@ if __name__ == '__main__':
     sc = SparkContext(pyFiles=files)
     sc.setLogLevel("WARN")
 
-    result = run_job(sc, sys.argv[1], int(sys.argv[2]), sys.argv[3:])
-    print(result.takeSample(False, 3))
+    run_job(sc, sys.argv[1], int(sys.argv[2]), sys.argv[3:])
 
     sc.stop()
