@@ -16,22 +16,7 @@ class SparkJobTest(unittest.TestCase):
         result = index.run_job(self.sc, 'user__reputation__to__upvotes_cast', 3, ['tests/fixtures/users.xml'])
         data = result.collectAsMap()
         self.assertDictEqual(data, {
-            (1.5, 1.5): [
-                (1, 1),
-                (1, 2),
-                (2, 2),
-                (2, 1),
-            ],
-            (1.5, 8.5): [
-                (2, 8),
-                (2, 8),
-                (1, 9),
-                (1, 9),
-            ],
-            (8.5, 1.0): [
-                (8, 0),
-                (8, 1),
-                (9, 1),
-                (9, 2),
-            ],
+            (8.5, 1.0): (4, 0.80901699437494745),
+            (1.5, 1.5): (4, 0.70710678118654757),
+            (1.5, 8.5): (4, 0.70710678118654757),
         })

@@ -18,6 +18,14 @@ def find_cluster_centroids(points, k):
     random_clusters = [(generate_random_point(dimension_count, outer_vertices), []) for i in xrange(k)]
     best_clusters = parallelize_clusters(points.context, random_clusters)
 
+    # best_clusters is an RDD with the following schema:
+    # [
+    #   (centroid, point_list),
+    # ]
+    # where:
+    #   - centroid is a tuple containing the centroid coordinates
+    #   - point_list is a list of points (stored as tuples) of points contained in that cluster
+
     while True:
         old_clusters = assign_points_to_centroids(best_clusters.keys().collect(), points)
 
@@ -26,13 +34,32 @@ def find_cluster_centroids(points, k):
         new_cluster_keys = new_clusters.keys().collect()
 
         if best_clusters.keys().collect() == new_clusters.keys().collect():
-            return best_clusters
+            return map_clusters_for_output(best_clusters)
 
         # if the points were grouped into a number of centroids that's less than k
         # we need to generate random centroids to have k
         new_clusters = add_missing_centroids(k, new_clusters, dimension_count, outer_vertices, len(new_cluster_keys))
 
         best_clusters = new_clusters
+
+
+def map_clusters_for_output(best_clusters):
+    """
+    Maps the RDD containing the cluster mappings to the following format:
+
+    [
+        (centroid, num_of_points, average_distance_to_centroid)
+    ]
+
+    :param best_clusters: PipelinedRDD of centroid -> point mappings
+    :return: PipelinedRDD
+    """
+    return best_clusters.map(lambda cluster: (
+        cluster[0], (
+            len(cluster[1]),
+            calculate_average_distance(cluster[0], cluster[1])
+        )
+    ))
 
 
 def add_missing_centroids(k, new_clusters, dimension_count, outer_vertices, cluster_count):
@@ -86,6 +113,11 @@ def calculate_centroid(points):
     for i in xrange(len(points[0])):
         means.append(numpy.mean([p[i] for p in points]))
     return tuple(means)
+
+
+def calculate_average_distance(centroid, points):
+    distances = map(lambda p: calculate_distance(centroid, p), points)
+    return numpy.mean(distances)
 
 
 def calculate_distance(a, b):
