@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('Agg')
 import numpy as np
 import scipy.stats as stats
 import pylab as pl
@@ -13,7 +15,7 @@ def generate_distribution_plot(clusters, output_path):
 
         pl.plot(distances, pdf)
 
-    pl.savefig(output_path + 'distribution.jpg')
+    pl.savefig(output_path + 'distribution.png')
 
 
 def generate_scatter_plot(clusters, output_path):
@@ -22,10 +24,9 @@ def generate_scatter_plot(clusters, output_path):
     for point_list in clusters.itervalues():
         data = zip(*point_list)
 
-        # todo support N dimensions
-        pyplot.scatter(data[1], data[2], c=np.random.rand(3,))
+        pyplot.scatter(data[0], data[1], c=np.random.rand(3,))
 
-        pyplot.savefig(output_path + 'scatter.jpg')
+        pyplot.savefig(output_path + 'scatter.png')
 
 
 def generate_bubble_plot(clusters, output_path):
@@ -35,7 +36,7 @@ def generate_bubble_plot(clusters, output_path):
 
         pyplot.scatter(centroid[0], centroid[1], len(points), c=np.random.rand(3,))
 
-        pyplot.savefig(output_path + 'bubble.jpg')
+        pyplot.savefig(output_path + 'bubble.png')
 
 
 def generate_pie_plot(clusters, output_path):
@@ -45,4 +46,4 @@ def generate_pie_plot(clusters, output_path):
 
     pyplot.pie(sizes)
 
-    pyplot.savefig(output_path + 'pie.jpg')
+    pyplot.savefig(output_path + 'pie.png')
