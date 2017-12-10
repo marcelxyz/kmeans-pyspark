@@ -8,6 +8,8 @@ from matplotlib import pyplot
 
 
 def generate_distribution_plot(clusters, output_path):
+    pyplot.clf()
+    
     for centroid, points in clusters.iteritems():
         distances = sorted([KMeans.calculate_distance(centroid, p) for p in points])
 
