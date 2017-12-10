@@ -76,3 +76,27 @@ Submitting a job on the cluster is done using this command:
 ```
 spark-submit src/index.py <job_name> <k> <input_file_path>
 ```
+
+### Batch mode
+
+If you want to schedule multiple jobs to run sequentially, then add the relevant commands to the `src/batch.sh` file.
+
+The syntax is the same as explained above. Make sure you properly reference the `${SRC_DIR}` variable as in the examples.
+
+To run all the jobs listed in the file simply execute:
+
+```
+./src/batch.sh
+```
+
+## Results
+
+For each job the following data is generated:
+
+1. A pickled (serialised) file containing the raw data. This is useful if you want to unpickle the data for post processing.
+1. A bubble graph showing the relative sizes of each cluster.
+1. A pie chart showing the relative sizes of each cluster.
+1. A graph showing the distribution of the distance of each point from the centroid (for each cluster - the plot should contain k lines).
+1. A scatter graph showing all the points in the clusters.
+
+This data is written to the `output/__your_job_name__/timestamp/` directory within the project (**NOT** on HDFS).

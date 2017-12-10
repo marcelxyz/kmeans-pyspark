@@ -42,7 +42,10 @@ def make_dir(job_name):
 
 def save_result(job_name, result):
     output_path = make_dir(job_name)
-    pickle.dump(result, open(output_path + 'data', 'w'))
+
+    with open(output_path + 'data.pickle', 'w') as pickle_file:
+        pickle.dump(result, pickle_file)
+
     plotter.generate_distribution_plot(result, output_path)
     plotter.generate_scatter_plot(result, output_path)
     plotter.generate_bubble_plot(result, output_path)
