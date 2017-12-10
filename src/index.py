@@ -5,7 +5,7 @@ import random
 import os
 import spark_jobs
 import sys
-# import plotter
+import plotter
 import pickle
 
 
@@ -42,11 +42,11 @@ def make_dir(job_name):
 
 def save_result(job_name, result):
     output_path = make_dir(job_name)
-    pickle.dump(result, open(output_path + 'data', 'w+'))
-    # plotter.generate_distribution_plot(result, output_path)
-    # plotter.generate_scatter_plot(result, output_path)
-    # plotter.generate_bubble_plot(result, output_path)
-    # plotter.generate_pie_plot(result, output_path)
+    pickle.dump(result, open(output_path + 'data', 'w'))
+    plotter.generate_distribution_plot(result, output_path)
+    plotter.generate_scatter_plot(result, output_path)
+    plotter.generate_bubble_plot(result, output_path)
+    plotter.generate_pie_plot(result, output_path)
 
 
 def run_job(sc, job_name, k, file_paths):
