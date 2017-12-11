@@ -99,22 +99,22 @@ class ClusteringTest(unittest.TestCase):
         self.assertEqual(len(centroids), self.k)
         self.assertDictEqual(centroids, {
             (1.5, 1.5, 1.0): [
-                (1, 1, 0),
-                (1, 2, 2),
-                (2, 2, 2),
-                (2, 1, 0),
+                (0, 0, 0),
+                (0, 1, 1),
+                (1, 1, 1),
+                (1, 0, 0),
             ],
             (1.5, 1.5, 8.0): [
-                (1, 1, 7),
-                (1, 2, 9),
-                (2, 2, 9),
-                (2, 1, 7),
+                (0, 0, 0),
+                (0, 1, 1),
+                (1, 1, 1),
+                (1, 0, 0),
             ],
             (8.5, 1.0, 1.0): [
-                (8, 0, 0),
-                (8, 1, 2),
-                (9, 1, 0),
-                (9, 2, 2),
+                (0, 0, 0),
+                (0, 0.5, 1),
+                (1, 0.5, 0),
+                (1, 0, 1),
             ],
         })
 
@@ -131,3 +131,18 @@ class ClusteringTest(unittest.TestCase):
             (5, 4),
         ]
         self.assertEqual(KMeans.calculate_average_distance(centre, points), 4)
+
+    def test_normalize_data(self):
+        points = self.sc.parallelize([
+            (10, 2, 50, 11),
+            (25, 4, 55, 12),
+            (80, 9, 60, 19),
+            (100, 10, 65, 21),
+        ])
+        result = self.kmeans.normalize_data(points, 4).collect()
+        self.assertEqual(result, [
+            (0, 0, 0, 0),
+            (1/6.0, 1/4.0, 1/3.0, 1/10.0),
+            (7/9.0, 7/8.0, 2/3.0, 4/5.0),
+            (1, 1, 1, 1),
+        ])

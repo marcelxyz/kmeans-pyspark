@@ -1,7 +1,9 @@
+from __future__ import division
 import math
 import random
 import numpy
-
+from pyspark.sql import SQLContext
+from pyspark.sql.types import *
 
 class KMeans:
     def __init__(self, k):
@@ -17,6 +19,9 @@ class KMeans:
         points.cache()
 
         dimension_count = len(points.first())
+
+        points = self.normalize_data(points, dimension_count)
+
         outer_vertices = self.find_outer_vertices(points)
 
         random_clusters = [(self.generate_random_point(dimension_count, outer_vertices), []) for i in xrange(self.k)]
@@ -53,6 +58,41 @@ class KMeans:
         random_clusters = [(self.generate_random_point(dimension_count, outer_vertices), []) for i in xrange(k - cluster_count)]
 
         return self.parallelize_clusters(new_clusters.context, random_clusters).union(new_clusters)
+
+    def normalize_data(self, points, dimension_count):
+        """
+        Normalizes all points so they are between 0 and 1 within their column.
+
+        :param points: RDD of all points
+        :param dimension_count: number of dimensions in each point
+        :return: RDD containing normalized data points
+        """
+        normalized_columns = map(lambda column: self.normalize_column(points, column), xrange(dimension_count))
+        return reduce(lambda a, b: a.zip(b).map(self.flatten_points), normalized_columns)
+
+    @staticmethod
+    def flatten_points(point):
+        return KMeans.flatten_points_recursive(point, [])
+
+    @staticmethod
+    def flatten_points_recursive(points, result):
+        for point in points:
+            try:
+                iter(point)
+            except TypeError:
+                result.append(point)
+            else:
+                result = KMeans.flatten_points_recursive(point, result)
+        return result
+
+    @staticmethod
+    def normalize_column(points, column_index):
+        column = points.map(lambda p: p[column_index])
+
+        minimum = column.min()
+        maximum = column.max()
+
+        return column.map(lambda value: (value - minimum) / (maximum - minimum))
 
     @staticmethod
     def parallelize_clusters(context, clusters):
