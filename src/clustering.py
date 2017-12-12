@@ -2,8 +2,7 @@ from __future__ import division
 import math
 import random
 import numpy
-from pyspark.sql import SQLContext
-from pyspark.sql.types import *
+
 
 class KMeans:
     def __init__(self, k):

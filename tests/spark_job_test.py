@@ -1,7 +1,7 @@
 import random
 import unittest
 from pyspark import SparkContext
-import index
+import spark_jobs
 
 
 class SparkJobTest(unittest.TestCase):
@@ -13,25 +13,24 @@ class SparkJobTest(unittest.TestCase):
         self.sc.stop()
 
     def test_user__reputation__to__upvotes_cast(self):
-        result = index.run_job(self.sc, 'user__reputation__to__upvotes_cast', 3, ['tests/fixtures/users.xml'])
+        xml_file = self.sc.textFile('fixtures/users.xml')
+        result = spark_jobs.user__reputation__to__upvotes_cast(3, xml_file)
         data = result.collectAsMap()
         self.assertDictEqual(data, {
-            (1.5, 1.5): [
-                (1, 1),
-                (1, 2),
-                (2, 2),
-                (2, 1),
+            (0.9375, 0.1111111111111111): [
+                (0.875, 0.0),
+                (0.875, 0.1111111111111111),
+                (1.0, 0.1111111111111111), (1.0, 0.2222222222222222),
             ],
-            (1.5, 8.5): [
-                (2, 8),
-                (2, 8),
-                (1, 9),
-                (1, 9),
+            (0.0625, 0.94444444444444442): [
+                (0.125, 0.8888888888888888),
+                (0.125, 0.8888888888888888),
+                (0.0, 1.0),
+                (0.0, 1.0),
             ],
-            (8.5, 1.0): [
-                (8, 0),
-                (8, 1),
-                (9, 1),
-                (9, 2),
-            ],
-        })
+            (0.0625, 0.16666666666666669): [
+                (0.0, 0.1111111111111111),
+                (0.0, 0.2222222222222222),
+                (0.125, 0.2222222222222222),
+                (0.125, 0.1111111111111111),
+            ]})
