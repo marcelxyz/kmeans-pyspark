@@ -1,3 +1,4 @@
+from __future__ import division
 import math
 import random
 import numpy
@@ -17,6 +18,9 @@ class KMeans:
         points.cache()
 
         dimension_count = len(points.first())
+
+        points = self.normalize_data(points, dimension_count)
+
         outer_vertices = self.find_outer_vertices(points)
 
         random_clusters = [(self.generate_random_point(dimension_count, outer_vertices), []) for i in xrange(self.k)]
@@ -53,6 +57,48 @@ class KMeans:
         random_clusters = [(self.generate_random_point(dimension_count, outer_vertices), []) for i in xrange(k - cluster_count)]
 
         return self.parallelize_clusters(new_clusters.context, random_clusters).union(new_clusters)
+
+    def normalize_data(self, points, dimension_count):
+        """
+        Normalizes all points so they are between 0 and 1 within their column.
+
+        :param points: RDD of all points
+        :param dimension_count: number of dimensions in each point
+        :return: RDD containing normalized data points
+        """
+        normalized_columns = map(lambda column: self.normalize_column(points, column), xrange(dimension_count))
+        return reduce(lambda a, b: a.zip(b).map(self.flatten_points), normalized_columns)
+
+    @staticmethod
+    def flatten_points(point):
+        """
+        Converts tuples of the form ((a, b), c) to (a, b, c).
+
+        :param point: One or two dimensional tuple
+        :return: One dimensional point tuple
+        """
+        if isinstance(point[0], tuple):
+            flat_value = list(point[0])
+            flat_value.append(point[1])
+            return tuple(flat_value)
+
+        return point
+
+    @staticmethod
+    def normalize_column(points, column_index):
+        """
+        Normalizes a single column of values (one dimension) so all its values are between 0 and 1.
+
+        :param points: RDD of all points
+        :param column_index: Column/dimension to normalize
+        :return: RDD containing the mapped column
+        """
+        column = points.map(lambda p: p[column_index])
+
+        minimum = column.min()
+        maximum = column.max()
+
+        return column.map(lambda value: (value - minimum) / (maximum - minimum))
 
     @staticmethod
     def parallelize_clusters(context, clusters):
