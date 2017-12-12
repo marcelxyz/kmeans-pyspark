@@ -1,6 +1,3 @@
-import xml.etree.ElementTree as ET
-
-
 def extract_attribute_value(xml, attribute_name):
     beg = '%s="' % attribute_name
     end = '" '
