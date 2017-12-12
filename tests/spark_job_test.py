@@ -37,5 +37,11 @@ class SparkJobTest(unittest.TestCase):
 
     def test_user__upvotes_cast__to__average_post_length__to__profile_views(self):
         users_xml = self.sc.textFile('fixtures/users.xml')
+        posts_xml = self.sc.textFile('fixtures/posts.xml')
+        result = spark_jobs.user__upvotes_cast__to__average_post_length__to__profile_views(3, users_xml, posts_xml)
+
+    def test_user__membership_time__to__closed_questions(self):
+        users_xml = self.sc.textFile('fixtures/users.xml')
+        posts_xml = self.sc.textFile('fixtures/posts.xml')
         post_history_xml = self.sc.textFile('fixtures/post-history.xml')
-        result = spark_jobs.user__upvotes_cast__to__average_post_length__to__profile_views(3, users_xml, post_history_xml)
+        result = spark_jobs.user__membership_time__to__closed_questions(3, users_xml, posts_xml, post_history_xml)

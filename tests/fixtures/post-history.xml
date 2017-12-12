@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <posthistory>
-    <row UserId="1" Text="a" />
-    <row UserId="1" Text="aa" />
+    <row PostId="4" UserId="1" PostHistoryTypeId="10" />
+    <row PostId="4" UserId="1" PostHistoryTypeId="10" />
 
-    <row UserId="2" Text="bbbb" />
-    <row UserId="3" Text="bbbbb" />
+    <row PostId="3" UserId="1" PostHistoryTypeId="12" />
+    <row PostId="3" UserId="2" PostHistoryTypeId="10" />
 
-    <row UserId="4" Text="bbbb" />
-    <row UserId="4" Text="bbbbbbbb" />
+    <row PostId="2" UserId="3" PostHistoryTypeId="7" />
+
+    <row PostId="1" UserId="4" PostHistoryTypeId="4" />
+    <row PostId="1" UserId="4" PostHistoryTypeId="10" />
+    <row PostId="1" UserId="4" PostHistoryTypeId="10" />
+    <row PostId="1" UserId="4" PostHistoryTypeId="12" />
+    <row PostId="1" UserId="4" PostHistoryTypeId="12" />
 </posthistory>
