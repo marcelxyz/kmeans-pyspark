@@ -14,7 +14,7 @@ def user__reputation__to__upvotes_cast(k, user_lines):
 
     :param k: Number of clusters
     :param user_lines: PythonRDD containing the lines in the users XML file
-    :return: PythonRDD of results
+    :return: RDD of clustered data
     """
     result = user_lines \
         .map(lambda line: xml_parser.extract_attributes(line, ['Reputation', 'UpVotes'], int)) \
@@ -25,13 +25,16 @@ def user__reputation__to__upvotes_cast(k, user_lines):
 
 def length__aboutme__to__user_rep(k, user_lines):
     """
-    Classifies users based on their about me length and reputation.
+    Classifies users based on the following:
+        - length of about me
+        - user reputation
+
     :param k: Number of clusters
-    :param user_lines: PythonRDD containing the lines in the users XML file
-    :return: PythonRDD of results
+    :param user_lines: RDD with XML file with users
+    :return: RDD of clustered data
     """
     result = user_lines \
-        .map(lambda line: xml_parser.extract_attributes(line, ["Reputation", "AboutMe"])) \
+        .map(lambda line: xml_parser.extract_attributes(line, ['Reputation', 'AboutMe'])) \
         .filter(lambda a: any(a)) \
         .map(lambda a: (int(a[0]), len(a[1])))
 
@@ -40,21 +43,24 @@ def length__aboutme__to__user_rep(k, user_lines):
 
 def post__edits__average__to__user_rep(k, user_lines, post_history_lines):
     """
-    Classifies users based on their average number of post edits and reputation.
+    Classifies users based on the following:
+        - number of times a user's post has been edited
+        - user's reputation
+
     :param k: Number of clusters
-    :param user_lines: PythonRDD containing the lines in the users XML file
-    :param post_history_lines: PythonRDD containing the lines in the post history XML file
-    :return: PythonRDD of results
+    :param user_lines: RDD with XML file with users
+    :param post_history_lines: RDD with XML file with post history
+    :return: RDD of clustered data
     """
     reputations = user_lines \
-        .map(lambda line: xml_parser.extract_attributes(line, ["Id", "Reputation"], int)) \
+        .map(lambda line: xml_parser.extract_attributes(line, ['Id', 'Reputation'], int)) \
         .filter(lambda a: any(a))
 
     post_edits_average = post_history_lines \
-        .map(lambda line: xml_parser.extract_attributes(line, ["UserId", "PostHistoryTypeId"], int)) \
+        .map(lambda line: xml_parser.extract_attributes(line, ['UserId', 'PostHistoryTypeId'], int)) \
         .filter(lambda a: any(a) and a[1] == 5) \
-        .map(lambda a: (int(a[0]), 1)) \
-        .reduceByKey(lambda a, b: a + b)
+        .map(lambda a: (a[0], 1)) \
+        .reduceByKey(add)
 
     result = reputations.join(post_edits_average).map(lambda value: value[1])
 
@@ -62,7 +68,7 @@ def post__edits__average__to__user_rep(k, user_lines, post_history_lines):
 
 
 def datetime_to_timestamp(datetime_value):
-    return time.mktime(datetime.strptime(datetime_value, "%Y-%m-%dT%H:%M:%S.%f").timetuple())
+    return time.mktime(datetime.strptime(datetime_value, '%Y-%m-%dT%H:%M:%S.%f').timetuple())
 
 
 def user__membership_time__to__closed_questions(k, users, posts, post_history):
