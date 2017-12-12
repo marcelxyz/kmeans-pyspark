@@ -34,3 +34,8 @@ class SparkJobTest(unittest.TestCase):
                 (0.125, 0.2222222222222222),
                 (0.125, 0.1111111111111111),
             ]})
+
+    def test_user__upvotes_cast__to__average_post_length__to__profile_views(self):
+        users_xml = self.sc.textFile('fixtures/users.xml')
+        post_history_xml = self.sc.textFile('fixtures/post-history.xml')
+        result = spark_jobs.user__upvotes_cast__to__average_post_length__to__profile_views(3, users_xml, post_history_xml)

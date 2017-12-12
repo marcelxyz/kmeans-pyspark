@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<posthistory>
+    <row UserId="1" Text="a" />
+    <row UserId="1" Text="aa" />
+
+    <row UserId="2" Text="bbbb" />
+    <row UserId="3" Text="bbbbb" />
+
+    <row UserId="4" Text="bbbb" />
+    <row UserId="4" Text="bbbbbbbb" />
+</posthistory>
