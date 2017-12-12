@@ -72,21 +72,28 @@ class KMeans:
 
     @staticmethod
     def flatten_points(point):
-        return KMeans.flatten_points_recursive(point, [])
+        """
+        Converts tuples of the form ((a, b), c) to (a, b, c).
 
-    @staticmethod
-    def flatten_points_recursive(points, result):
-        for point in points:
-            try:
-                iter(point)
-            except TypeError:
-                result.append(point)
-            else:
-                result = KMeans.flatten_points_recursive(point, result)
-        return result
+        :param point: One or two dimensional tuple
+        :return: One dimensional point tuple
+        """
+        if isinstance(point[0], tuple):
+            flat_value = list(point[0])
+            flat_value.append(point[1])
+            return tuple(flat_value)
+
+        return point
 
     @staticmethod
     def normalize_column(points, column_index):
+        """
+        Normalizes a single column of values (one dimension) so all its values are between 0 and 1.
+
+        :param points: RDD of all points
+        :param column_index: Column/dimension to normalize
+        :return: RDD containing the mapped column
+        """
         column = points.map(lambda p: p[column_index])
 
         minimum = column.min()
