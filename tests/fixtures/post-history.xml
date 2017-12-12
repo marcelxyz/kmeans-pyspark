@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<posthistory>
+    <row PostId="4" UserId="1" PostHistoryTypeId="10" />
+    <row PostId="4" UserId="1" PostHistoryTypeId="10" />
+
+    <row PostId="3" UserId="1" PostHistoryTypeId="12" />
+    <row PostId="3" UserId="2" PostHistoryTypeId="10" />
+
+    <row PostId="2" UserId="3" PostHistoryTypeId="7" />
+
+    <row PostId="1" UserId="4" PostHistoryTypeId="4" />
+    <row PostId="1" UserId="4" PostHistoryTypeId="10" />
+    <row PostId="1" UserId="4" PostHistoryTypeId="10" />
+    <row PostId="1" UserId="4" PostHistoryTypeId="12" />
+    <row PostId="1" UserId="4" PostHistoryTypeId="12" />
+</posthistory>
