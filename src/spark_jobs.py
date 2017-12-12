@@ -163,7 +163,7 @@ def user__badges__to__signup__to__answers_and_questions(k, user_lines, badges_li
     posts = posts_lines \
         .map(lambda line: xml_parser.extract_attributes(line, ['OwnerUserId', 'PostTypeId'], int)) \
         .filter(lambda a: any(a)) \
- 
+
         # (user_id, n_answers)
     user_id_answers = posts \
         .filter(lambda a: a[1] == 2) \
@@ -224,7 +224,7 @@ def user__signup__to__distinct_post_tags(k, user_lines, post_lines):
     # (user_id, number_distinct_tags)
     user_id_tags = post_lines \
         .map(lambda line: xml_parser.extract_attributes(line, ['OwnerUserId', 'Tags'], str)) \
-        .filter(lambda a: (None not in a and len(a) == 2) \
+        .filter(lambda a: (None not in a and len(a) == 2)) \
         .map(lambda a: (int(a[0]), a[1].replace(">", "")[1:])) \
         .map(lambda a: (a[0], a[1].split("<"))) \
         .flatMapValues(lambda a: a) \
