@@ -1,9 +1,8 @@
 from __future__ import division
 from clustering import KMeans
-from datetime import datetime
 from operator import add
-import time
 import xml_parser
+import helpers
 
 
 def user__reputation__to__upvotes_cast(k, user_lines):
@@ -18,7 +17,7 @@ def user__reputation__to__upvotes_cast(k, user_lines):
     """
     result = user_lines \
         .map(lambda line: xml_parser.extract_attributes(line, ['Reputation', 'UpVotes'], int)) \
-        .filter(lambda a: any(a))
+        .filter(lambda a: helpers.is_valid_tuple(a, 2))
 
     return KMeans(k).fit(result)
 
@@ -35,7 +34,7 @@ def length__aboutme__to__user_rep(k, user_lines):
     """
     result = user_lines \
         .map(lambda line: xml_parser.extract_attributes(line, ['Reputation', 'AboutMe'])) \
-        .filter(lambda a: any(a)) \
+        .filter(lambda a: helpers.is_valid_tuple(a, 2)) \
         .map(lambda a: (int(a[0]), len(a[1])))
 
     return KMeans(k).fit(result)
@@ -54,21 +53,17 @@ def post__edits__average__to__user_rep(k, user_lines, post_history_lines):
     """
     reputations = user_lines \
         .map(lambda line: xml_parser.extract_attributes(line, ['Id', 'Reputation'], int)) \
-        .filter(lambda a: any(a))
+        .filter(lambda a: helpers.is_valid_tuple(a, 2))
 
     post_edits_average = post_history_lines \
         .map(lambda line: xml_parser.extract_attributes(line, ['UserId', 'PostHistoryTypeId'], int)) \
-        .filter(lambda a: any(a) and a[1] == 5) \
+        .filter(lambda a: helpers.is_valid_tuple(a, 2) and a[1] == 5) \
         .map(lambda a: (a[0], 1)) \
         .reduceByKey(add)
 
     result = reputations.join(post_edits_average).map(lambda value: value[1])
 
     return KMeans(k).fit(result)
-
-
-def datetime_to_timestamp(datetime_value):
-    return time.mktime(datetime.strptime(datetime_value, '%Y-%m-%dT%H:%M:%S.%f').timetuple())
 
 
 def user__membership_time__to__closed_questions(k, users, posts, post_history):
@@ -86,18 +81,18 @@ def user__membership_time__to__closed_questions(k, users, posts, post_history):
     # (user_id, timestamp)
     user_data = users\
         .map(lambda line: xml_parser.extract_attributes(line, ['Id', 'CreationDate']))\
-        .filter(lambda a: any(a))\
-        .map(lambda data: (int(data[0]), datetime_to_timestamp(data[1])))\
+        .filter(lambda a: helpers.is_valid_tuple(a, 2))\
+        .map(lambda data: (int(data[0]), helpers.datetime_to_timestamp(data[1])))\
 
     # (post_id, author_user_id)
     post_data = posts\
         .map(lambda line: xml_parser.extract_attributes(line, ['Id', 'OwnerUserId'], int))\
-        .filter(lambda a: any(a))
+        .filter(lambda a: helpers.is_valid_tuple(a, 2))
 
     # (post_id, number_of_close_and_delete_votes)
     post_history_data = post_history\
         .map(lambda line: xml_parser.extract_attributes(line, ['PostId', 'PostHistoryTypeId'], int))\
-        .filter(lambda a: any(a) and a[1] in [10, 12])\
+        .filter(lambda a: helpers.is_valid_tuple(a, 2) and a[1] in [10, 12])\
         .map(lambda a: (a[0], 1))\
         .reduceByKey(add)
 
@@ -127,7 +122,7 @@ def user__upvotes_cast__to__average_post_length__to__profile_views(k, users, pos
     # (user_id, average_post_length)
     user_avg_post_length = posts\
         .map(lambda line: xml_parser.extract_attributes(line, ['OwnerUserId', 'Body']))\
-        .filter(lambda a: any(a))\
+        .filter(lambda a: helpers.is_valid_tuple(a, 2))\
         .map(lambda data: (int(data[0]), len(data[1])))\
         .aggregateByKey((0, 0), lambda a, b: (a[0] + b, a[1] + 1), lambda a, b: (a[0] + b[0], a[1] + b[1]))\
         .mapValues(lambda value: value[0] / value[1])
@@ -135,7 +130,7 @@ def user__upvotes_cast__to__average_post_length__to__profile_views(k, users, pos
     # (id, (upvotes_cast, profile_views))
     user_data = users\
         .map(lambda line: xml_parser.extract_attributes(line, ['Id', 'UpVotes', 'Views'], int))\
-        .filter(lambda a: any(a))\
+        .filter(lambda a: helpers.is_valid_tuple(a, 3))\
         .map(lambda data: (data[0], (data[1], data[2])))
 
     # (upvotes_cast, views, average_post_length)
@@ -149,22 +144,22 @@ def user__badges__to__signup__to__answers_and_questions(k, user_lines, badges_li
     # (user_id, signup)
     user_id_signup = user_lines \
         .map(lambda line: xml_parser.extract_attributes(line, ['Id', 'CreationDate'])) \
-        .filter(lambda a: any(a)) \
-        .map(lambda a: (int(a[0]), datetime_to_timestamp(a[1])))
+        .filter(lambda a: helpers.is_valid_tuple(a, 2)) \
+        .map(lambda a: (int(a[0]), helpers.datetime_to_timestamp(a[1])))
 
     # (user_id, number_badges)
     user_id_badges = badges_lines \
         .map(lambda line: xml_parser.extract_attributes(line, ['UserId'], int)) \
-        .filter(lambda a: any(a)) \
+        .filter(lambda a: helpers.is_valid_tuple(a, 1)) \
         .map(lambda a: (a[0], 1)) \
         .reduceByKey(add)
 
     # (user_id, post_type)
     posts = posts_lines \
         .map(lambda line: xml_parser.extract_attributes(line, ['OwnerUserId', 'PostTypeId'], int)) \
-        .filter(lambda a: any(a)) \
+        .filter(lambda a: helpers.is_valid_tuple(a, 2)) \
 
-        # (user_id, n_answers)
+    # (user_id, n_answers)
     user_id_answers = posts \
         .filter(lambda a: a[1] == 2) \
         .map(lambda a: (a[0], 1)) \
@@ -189,18 +184,18 @@ def user__reputation__to__own_questions_answered(k, user_lines, post_lines):
     # (user_id, rep)
     user_id_reputation = user_lines \
         .map(lambda line: xml_parser.extract_attributes(line, ['Id', 'Reputation'], int)) \
-        .filter(lambda a: any(a))
+        .filter(lambda a: helpers.is_valid_tuple(a, 2))
 
     # (user_id, n_questions)
     user_id_questions = post_lines \
         .map(lambda line: xml_parser.extract_attributes(line, ['Id', 'OwnerUserId', 'PostTypeId'], int)) \
-        .filter(lambda a: None not in a and len(a) == 3 and a[2] == 1) \
+        .filter(lambda a: helpers.is_valid_tuple(a, 3) and a[2] == 1) \
         .map(lambda a: (a[0], a[1]))
 
     # (user_id, n_asked)
     user_id_answers = post_lines \
         .map(lambda line: xml_parser.extract_attributes(line, ['ParentId', 'OwnerUserId', 'PostTypeId'], int)) \
-        .filter(lambda a: None not in a and len(a) == 3 and a[2] == 2) \
+        .filter(lambda a: helpers.is_valid_tuple(a, 3) and a[2] == 2) \
         .map(lambda a: (a[0], a[1]))
 
     # (user_id, n_questions_self_answered)
@@ -216,15 +211,15 @@ def user__reputation__to__own_questions_answered(k, user_lines, post_lines):
 
 def user__signup__to__distinct_post_tags(k, user_lines, post_lines):
     # (user_id, signup_as_timestamp)
-    creationdate = user_lines \
+    creation_date = user_lines \
         .map(lambda line: xml_parser.extract_attributes(line, ['Id', 'CreationDate'], str)) \
-        .filter(lambda a: any(a)) \
-        .map(lambda a: (int(a[0]), datetime_to_timestamp(a[1])))
+        .filter(lambda a: helpers.is_valid_tuple(a, 2)) \
+        .map(lambda a: (int(a[0]), helpers.datetime_to_timestamp(a[1])))
 
     # (user_id, number_distinct_tags)
     user_id_tags = post_lines \
         .map(lambda line: xml_parser.extract_attributes(line, ['OwnerUserId', 'Tags'], str)) \
-        .filter(lambda a: (None not in a and len(a) == 2)) \
+        .filter(lambda a: helpers.is_valid_tuple(a, 2)) \
         .map(lambda a: (int(a[0]), a[1].replace(">", "")[1:])) \
         .map(lambda a: (a[0], a[1].split("<"))) \
         .flatMapValues(lambda a: a) \
@@ -233,7 +228,7 @@ def user__signup__to__distinct_post_tags(k, user_lines, post_lines):
         .reduceByKey(sum)
 
     # (signup_as_timestamp, number_distinct_tags)
-    result = creationdate.join(user_id_tags).map(lambda a: (a[1][0], a[1][1]))
+    result = creation_date.join(user_id_tags).map(lambda a: (a[1][0], a[1][1]))
 
     return KMeans(k).fit(result)
 
@@ -242,12 +237,12 @@ def user__reputation__to__distinct_post_tags(k, user_lines, post_lines):
     # (user_id, reputation)
     rep = user_lines \
         .map(lambda line: xml_parser.extract_attributes(line, ['Id', 'Reputation'], int)) \
-        .filter(lambda a: any(a))
+        .filter(lambda a: helpers.is_valid_tuple(a, 2))
 
     # (user_id, number_distinct_tags)
     user_id_tags = post_lines \
         .map(lambda line: xml_parser.extract_attributes(line, ['OwnerUserId', 'Tags'])) \
-        .filter(lambda a: (None not in a and len(a) == 2)) \
+        .filter(lambda a: helpers.is_valid_tuple(a, 2)) \
         .map(lambda a: (int(a[0]), a[1].replace(">", "")[1:])) \
         .map(lambda a: (a[0], a[1].split("<"))) \
         .flatMapValues(lambda a: a) \
