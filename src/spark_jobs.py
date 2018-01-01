@@ -212,20 +212,20 @@ def user__reputation__to__own_questions_answered(k, user_lines, post_lines):
 def user__signup__to__distinct_post_tags(k, user_lines, post_lines):
     # (user_id, signup_as_timestamp)
     creation_date = user_lines \
-        .map(lambda line: xml_parser.extract_attributes(line, ['Id', 'CreationDate'], str)) \
+        .map(lambda line: xml_parser.extract_attributes(line, ['Id', 'CreationDate'])) \
         .filter(lambda a: helpers.is_valid_tuple(a, 2)) \
         .map(lambda a: (int(a[0]), helpers.datetime_to_timestamp(a[1])))
 
     # (user_id, number_distinct_tags)
     user_id_tags = post_lines \
-        .map(lambda line: xml_parser.extract_attributes(line, ['OwnerUserId', 'Tags'], str)) \
+        .map(lambda line: xml_parser.extract_attributes(line, ['OwnerUserId', 'Tags'])) \
         .filter(lambda a: helpers.is_valid_tuple(a, 2)) \
         .map(lambda a: (int(a[0]), a[1].replace(">", "")[1:])) \
         .map(lambda a: (a[0], a[1].split("<"))) \
         .flatMapValues(lambda a: a) \
         .distinct() \
         .map(lambda a: (a[0], 1)) \
-        .reduceByKey(sum)
+        .reduceByKey(add)
 
     # (signup_as_timestamp, number_distinct_tags)
     result = creation_date.join(user_id_tags).map(lambda a: (a[1][0], a[1][1]))
@@ -248,9 +248,40 @@ def user__reputation__to__distinct_post_tags(k, user_lines, post_lines):
         .flatMapValues(lambda a: a) \
         .distinct() \
         .map(lambda a: (a[0], 1)) \
-        .reduceByKey(sum)
+        .reduceByKey(add)
 
     # (rep, number_distinct_tags)
     result = rep.join(user_id_tags).map(lambda a: (a[1][0], a[1][1]))
 
     return KMeans(k).fit(result)
+
+
+def user_rep_to_answers_and_questions(k, user_lines, posts_lines):
+    reputation = user_lines \
+        .map(lambda line: xml_parser.extract_attributes(line, ['Id', 'Reputation'], int)) \
+        .filter(lambda a: helpers.is_valid_tuple(a, 2))
+
+    posts = posts_lines \
+        .map(lambda line: xml_parser.extract_attributes(line, ['OwnerUserId', 'PostTypeId'], int)) \
+        .filter(lambda a: helpers.is_valid_tuple(a, 2))
+
+    questions = posts \
+        .filter(lambda a: a[1] == 1) \
+        .map(lambda a: (a[0], 1)) \
+        .reduceByKey(add)
+
+    answers = posts \
+        .filter(lambda a: a[1] == 2) \
+        .map(lambda a: (a[0], 1)) \
+        .reduceByKey(add)
+
+    # (user_id, (answer_count, question_count))
+    ratio = answers.join(questions)
+
+    # (user_id, (user_rep, (answer_count, question_count)))
+    result = reputation.join(ratio)
+
+    # (user_rep, answer_count, question_count)
+    flat_result = result.map(lambda a: (a[1][0], a[1][1][0], a[1][1][1]))
+
+    return KMeans(k).fit(flat_result)
