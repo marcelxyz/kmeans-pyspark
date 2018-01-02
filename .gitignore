@@ -5,3 +5,4 @@ metastore_db
 *.pyc
 output
 .DS_Store
+logs

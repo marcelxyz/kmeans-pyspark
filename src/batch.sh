@@ -1,5 +1,11 @@
 #!/bin/sh
 
+if [ $# -lt 2 ]
+then
+    echo "Usage: $0 job_number k"
+    exit
+fi
+
 USERS=/data/stackoverflow/Users
 POSTS=/data/stackoverflow/Posts
 POST_HISTORY=/data/stackoverflow/PostHistory
@@ -11,24 +17,39 @@ LOGS_DIR=${SRC_DIR}/../logs
 
 mkdir -p ${LOGS_DIR}
 
-spark-submit ${SRC_DIR}/index.py user__reputation__to__upvotes_cast 4 $USERS &> ${LOGS_DIR}/user__reputation__to__upvotes_cast
+case "$1" in
 
-spark-submit ${SRC_DIR}/index.py length__aboutme__to__user_rep 4 $USERS &> ${LOGS_DIR}/length__aboutme__to__user_rep
+1) spark-submit ${SRC_DIR}/index.py user__reputation__to__upvotes_cast $2 $USERS &> ${LOGS_DIR}/user__reputation__to__upvotes_cast
+;;
 
-spark-submit ${SRC_DIR}/index.py post__edits__average__to__user_rep 4 $USERS $POST_HISTORY &> ${LOGS_DIR}/post__edits__average__to__user_rep
+2) spark-submit ${SRC_DIR}/index.py length__aboutme__to__user_rep $2 $USERS &> ${LOGS_DIR}/length__aboutme__to__user_rep
+;;
 
-spark-submit ${SRC_DIR}/index.py user__membership_time__to__closed_questions 4 $USERS $POSTS $POST_HISTORY &> ${LOGS_DIR}/user__membership_time__to__closed_questions
+3) spark-submit ${SRC_DIR}/index.py post__edits__average__to__user_rep $2 $USERS $POST_HISTORY &> ${LOGS_DIR}/post__edits__average__to__user_rep
+;;
 
-spark-submit ${SRC_DIR}/index.py user__upvotes_cast__to__average_post_length__to__profile_views 4 $USERS $POSTS &> ${LOGS_DIR}/user__upvotes_cast__to__average_post_length__to__profile_views
+4) spark-submit ${SRC_DIR}/index.py user__membership_time__to__closed_questions $2 $USERS $POSTS $POST_HISTORY &> ${LOGS_DIR}/user__membership_time__to__closed_questions
+;;
 
-spark-submit ${SRC_DIR}/index.py user__badges__to__signup__to__answers_and_questions 4 $USERS $BADGES $POSTS &> ${LOGS_DIR}/user__badges__to__signup__to__answers_and_questions
+5) spark-submit ${SRC_DIR}/index.py user__upvotes_cast__to__average_post_length__to__profile_views $2 $USERS $POSTS &> ${LOGS_DIR}/user__upvotes_cast__to__average_post_length__to__profile_views
+;;
 
-spark-submit ${SRC_DIR}/index.py user__reputation__to__own_questions_answered 4 $USERS $POSTS &> ${LOGS_DIR}/user__reputation__to__own_questions_answered
+6) spark-submit ${SRC_DIR}/index.py user__badges__to__signup__to__answers_and_questions $2 $USERS $BADGES $POSTS &> ${LOGS_DIR}/user__badges__to__signup__to__answers_and_questions
+;;
 
-spark-submit ${SRC_DIR}/index.py user__signup__to__distinct_post_tags 4 $USERS $POSTS &> ${LOGS_DIR}/user__signup__to__distinct_post_tags
+7) spark-submit ${SRC_DIR}/index.py user__reputation__to__own_questions_answered $2 $USERS $POSTS &> ${LOGS_DIR}/user__reputation__to__own_questions_answered
+;;
 
-spark-submit ${SRC_DIR}/index.py user__reputation__to__distinct_post_tags 4 $USERS $POSTS &> ${LOGS_DIR}/user__reputation__to__distinct_post_tags
+8) spark-submit ${SRC_DIR}/index.py user__signup__to__distinct_post_tags $2 $USERS $POSTS &> ${LOGS_DIR}/user__signup__to__distinct_post_tags
+;;
 
-spark-submit ${SRC_DIR}/index.py user_rep_to_answers_and_questions 4 $USERS $POSTS &> ${LOGS_DIR}/user_rep_to_answers_and_questions
+9) spark-submit ${SRC_DIR}/index.py user__reputation__to__distinct_post_tags $2 $USERS $POSTS &> ${LOGS_DIR}/user__reputation__to__distinct_post_tags
+;;
 
-spark-submit ${SRC_DIR}/index.py user_rep_to_bounty 4 $USERS $VOTES $POSTS &> ${LOGS_DIR}/user_rep_to_bounty
+10) spark-submit ${SRC_DIR}/index.py user_rep_to_answers_and_questions $2 $USERS $POSTS &> ${LOGS_DIR}/user_rep_to_answers_and_questions
+;;
+
+11) spark-submit ${SRC_DIR}/index.py user_rep_to_bounty $2 $USERS $VOTES $POSTS &> ${LOGS_DIR}/user_rep_to_bounty
+;;
+
+esac
