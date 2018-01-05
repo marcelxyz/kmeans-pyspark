@@ -49,7 +49,19 @@ case "$1" in
 10) spark-submit ${SRC_DIR}/index.py user_rep_to_answers_and_questions $2 $USERS $POSTS &> ${LOGS_DIR}/user_rep_to_answers_and_questions
 ;;
 
-11) spark-submit ${SRC_DIR}/index.py user_rep_to_bounty $2 $USERS $VOTES $POSTS &> ${LOGS_DIR}/user_rep_to_bounty
+11) spark-submit ${SRC_DIR}/index.py user_rep $2 $USERS &> ${LOGS_DIR}/user_rep
+;;
+
+12) spark-submit ${SRC_DIR}/index.py user_upvotes_cast $2 $USERS &> ${LOGS_DIR}/user_upvotes_cast
+;;
+
+13) spark-submit ${SRC_DIR}/index.py user_downvotes_cast $2 $USERS &> ${LOGS_DIR}/user_downvotes_cast
+;;
+
+14) spark-submit ${SRC_DIR}/index.py user_questions_asked $2 $POSTS &> ${LOGS_DIR}/user_questions_asked
+;;
+
+15) spark-submit ${SRC_DIR}/index.py user_questions_answered $2 $POSTS &> ${LOGS_DIR}/user_questions_answered
 ;;
 
 esac

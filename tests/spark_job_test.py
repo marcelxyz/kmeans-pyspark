@@ -35,13 +35,42 @@ class SparkJobTest(unittest.TestCase):
                 (0.125, 0.1111111111111111),
             ]})
 
-    def test_user__upvotes_cast__to__average_post_length__to__profile_views(self):
-        users_xml = self.sc.textFile('fixtures/users.xml')
-        posts_xml = self.sc.textFile('fixtures/posts.xml')
-        result = spark_jobs.user__upvotes_cast__to__average_post_length__to__profile_views(3, users_xml, posts_xml)
+    def test_user_rep(self):
+        xml_file = self.sc.textFile('fixtures/users.xml')
+        result = spark_jobs.user_rep(2, xml_file)
+        data = result.collectAsMap()
+        self.assertDictEqual(data, {
+            (1.0/16,): [
+                (0,), (0,),
+                (0.125,), (0.125,), (0.125,), (0.125,),
+                (0,), (0,),
+            ],
+            (1.875/2,): [
+                (0.875,), (0.875,),
+                (1,), (1,),
+            ],
+        })
 
-    def test_user__membership_time__to__closed_questions(self):
-        users_xml = self.sc.textFile('fixtures/users.xml')
-        posts_xml = self.sc.textFile('fixtures/posts.xml')
-        post_history_xml = self.sc.textFile('fixtures/post-history.xml')
-        result = spark_jobs.user__membership_time__to__closed_questions(3, users_xml, posts_xml, post_history_xml)
+    def test_user_questions_asked(self):
+        xml_file = self.sc.textFile('fixtures/posts.xml')
+        result = spark_jobs.user_questions_asked(1, xml_file)
+        data = result.collectAsMap()
+        self.assertDictEqual(data, {
+            (1.0/3,): [
+                (0,),
+                (0,),
+                (1,),
+            ],
+        })
+
+    def test_user_questions_answered(self):
+        xml_file = self.sc.textFile('fixtures/posts.xml')
+        result = spark_jobs.user_questions_answered(1, xml_file)
+        data = result.collectAsMap()
+        self.assertDictEqual(data, {
+            (0.5,): [
+                (1,),
+                (0.5,),
+                (0,),
+            ],
+        })

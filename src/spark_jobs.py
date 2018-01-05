@@ -22,6 +22,52 @@ def user__reputation__to__upvotes_cast(k, user_lines):
     return KMeans(k).fit(result)
 
 
+def user_rep(k, user_lines):
+    result = user_lines \
+        .map(lambda line: xml_parser.extract_attributes(line, ['Reputation'], int)) \
+        .filter(lambda a: helpers.is_valid_tuple(a, 1))
+
+    return KMeans(k).fit(result)
+
+
+def user_upvotes_cast(k, user_lines):
+    result = user_lines \
+        .map(lambda line: xml_parser.extract_attributes(line, ['UpVotes'], int)) \
+        .filter(lambda a: helpers.is_valid_tuple(a, 1))
+
+    return KMeans(k).fit(result)
+
+
+def user_downvotes_cast(k, user_lines):
+    result = user_lines \
+        .map(lambda line: xml_parser.extract_attributes(line, ['DownVotes'], int)) \
+        .filter(lambda a: helpers.is_valid_tuple(a, 1))
+
+    return KMeans(k).fit(result)
+
+
+def user_questions_asked(k, posts_lines):
+    result = posts_lines \
+        .map(lambda line: xml_parser.extract_attributes(line, ['OwnerUserId', 'PostTypeId'], int)) \
+        .filter(lambda a: helpers.is_valid_tuple(a, 2) and a[1] == 1) \
+        .map(lambda a: (a[0], 1)) \
+        .reduceByKey(add) \
+        .map(lambda a: (a[1],))
+
+    return KMeans(k).fit(result)
+
+
+def user_questions_answered(k, posts_lines):
+    result = posts_lines \
+        .map(lambda line: xml_parser.extract_attributes(line, ['OwnerUserId', 'PostTypeId'], int)) \
+        .filter(lambda a: helpers.is_valid_tuple(a, 2) and a[1] == 2) \
+        .map(lambda a: (a[0], 1)) \
+        .reduceByKey(add) \
+        .map(lambda a: (a[1],))
+
+    return KMeans(k).fit(result)
+
+
 def length__aboutme__to__user_rep(k, user_lines):
     """
     Classifies users based on the following:

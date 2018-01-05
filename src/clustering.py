@@ -67,6 +67,10 @@ class KMeans:
         :return: RDD containing normalized data points
         """
         normalized_columns = map(lambda column: self.normalize_column(points, column), xrange(dimension_count))
+
+        if dimension_count == 1:
+            return normalized_columns[0].map(lambda value: (value,))
+
         return reduce(lambda a, b: a.zip(b).map(self.flatten_points), normalized_columns)
 
     @staticmethod

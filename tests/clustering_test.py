@@ -151,3 +151,16 @@ class ClusteringTest(unittest.TestCase):
             (7/9.0, 7/8.0, 2/3.0, 4/5.0),
             (1, 1, 1, 1),
         ])
+
+    def test_normalize_data__single_column(self):
+        points = self.sc.parallelize([
+            (1,),
+            (2,),
+            (3,),
+        ])
+        result = self.kmeans.normalize_data(points, 1).collect()
+        self.assertEqual(result, [
+            (0,),
+            (0.5,),
+            (1,),
+        ])
